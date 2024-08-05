@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200.43" height="199.99" version="1.0" viewBox="0 0 150.32 150" xmlns="http://www.w3.org/2000/svg" zoomAndPan="magnify">
+ <defs>
+  <clipPath id="eb58ef3dc4">
+   <path d="m487.33 194.58h36.668v67.914h-36.668z"/>
+  </clipPath>
+  <clipPath id="fc8c6edbfb">
+   <path d="m544.04 174.12h36.77v88.371h-36.77z"/>
+  </clipPath>
+  <clipPath id="d25d2c7417">
+   <path d="m601 153.67h36.652v108.82h-36.652z"/>
+  </clipPath>
+  <clipPath id="b87995a839">
+   <path d="m487.24 123h99.758v52h-99.758z"/>
+  </clipPath>
+  <clipPath id="f37f00be63">
+   <path d="m571 112.5h30v40.5h-30z"/>
+  </clipPath>
+ </defs>
+ <g transform="translate(-487.33 -112.5)" clip-path="url(#eb58ef3dc4)">
+  <path d="m487.33 262.5h36.543v-67.84h-36.543v67.84" fill="#fefce6"/>
+ </g>
+ <g transform="translate(-487.33 -112.5)" clip-path="url(#fc8c6edbfb)">
+  <path d="m544.22 262.5h36.543v-88.25h-36.543v88.25" fill="#fefce6"/>
+ </g>
+ <g transform="translate(-487.33 -112.5)" clip-path="url(#d25d2c7417)">
+  <path d="m601.11 262.5h36.543v-108.66h-36.543v108.66" fill="#fefce6"/>
+ </g>
+ <g transform="translate(-487.33 -112.5)" clip-path="url(#b87995a839)">
+  <path d="m586.97 139.21-99.641 35.031 92.699-50.613z" fill="#fefce6"/>
+ </g>
+ <g transform="translate(-487.33 -112.5)" clip-path="url(#f37f00be63)">
+  <path d="m589.77 152.75-17.926-40.25 29.086 11.164z" fill="#fefce6"/>
+ </g>
+</svg>
