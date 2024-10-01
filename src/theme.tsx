@@ -1,4 +1,4 @@
-import { createTheme, Theme, ThemeOptions, PaletteOptions } from "@mui/material/styles"
+import { createTheme } from "@mui/material/styles"
 import { caES, esES, enUS } from "@mui/material/locale"
 import translations from "./translations"
 import type { MyTheme, Language, MyThemeOptions } from "./types"

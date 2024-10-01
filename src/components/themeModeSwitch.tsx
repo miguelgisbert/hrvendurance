@@ -7,7 +7,7 @@ interface ThemeModeSwitchProps extends SwitchProps {
 
 export const ThemeModeSwitch = styled(({ themeMode, ...props }: ThemeModeSwitchProps) => (
   <Switch {...props} />
-))(({ theme, themeMode }) => ({
+))(({ theme }) => ({
   width: 62,
   height: 34,
   padding: 7,

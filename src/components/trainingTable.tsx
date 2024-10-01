@@ -11,7 +11,7 @@ interface TrainingTableProps {
     };
 }
 
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+const StyledDataGrid = styled(DataGrid)(() => ({
     '& .MuiDataGrid-columnHeaders': {
         backgroundColor: 'transparent'
     },

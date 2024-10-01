@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import { Grid, Typography, Card, Box } from '@mui/material'
 import createMyTheme from './theme'
@@ -13,7 +13,6 @@ import runners from './assets/runners.svg'
 import improve from './assets/improve.svg'
 import TrainingTable from './components/trainingTable'
 import Survey from './components/survey.js'
-import Prueba from './prueba'
 
 function App() {
   const browserLang = navigator.language
@@ -29,9 +28,9 @@ function App() {
   }, [language, themeMode]);
 
   const primaryColor = currentTheme.palette.primary.main
-  const secondaryColor = currentTheme.palette.secondary.main
+  // const secondaryColor = currentTheme.palette.secondary.main
   const cardBackground = currentTheme.myBackground.cardBackground
-  const cardShadow = currentTheme.palette.background.cardShadow
+  // const cardShadow = currentTheme.palette.background.cardShadow
   const shadowColor = currentTheme.myBackground.cardShadow
 
   console.log(cardBackground)
@@ -140,8 +139,7 @@ function App() {
           </Grid>
 
           <Grid container>
-            {/* <Survey /> */}
-            {/* <Prueba /> */}
+            <Survey />
           </Grid>
           
         </Grid>    

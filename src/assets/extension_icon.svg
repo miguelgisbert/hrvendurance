@@ -1,0 +1,8 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class=""><rect id="r9" width="512" height="512" x="0" y="0" rx="128" fill="#18A7AD" stroke="#FFFFFF" stroke-width="0" stroke-opacity="100%" paint-order="stroke"></rect><clipPath id="clip"><use xlink:href="#r9"></use></clipPath><defs><linearGradient id="ra" gradientUnits="userSpaceOnUse" gradientTransform="rotate(180)" style="transform-origin: center center;"><stop stop-color="#18A7AD"></stop><stop offset="1" stop-color="#18A7AD"></stop></linearGradient><radialGradient id="rb" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256) rotate(90) scale(512)"><stop stop-color="white"></stop><stop offset="1" stop-color="white" stop-opacity="0"></stop></radialGradient></defs>
+<svg width="390" height="390" version="1.1" viewBox="0 0 176.4 119.45" xmlns="http://www.w3.org/2000/svg" x="71" y="61" alignment-baseline="middle" style="color: rgb(35, 35, 35);">
+ <g transform="translate(-.99997 -.98479)" fill="#fefce6">
+  <path d="m52.21 60.39-51.02-29.58a0.39 0.39 0 0 1-0.19-0.33v-29.1a0.39 0.39 0 0 1 0.59-0.34l102.35 59.35a0.39 0.39 0 0 1 0 0.68l-102.34 59.31a0.39 0.39 0 0 1-0.59-0.34l-0.01-29.08a0.39 0.39 0 0 1 0.19-0.33l51.02-29.56a0.39 0.39 0 0 0 0-0.68z"></path>
+  <path d="m125.44 60.38-50.99-29.56a0.4 0.4 0 0 1-0.2-0.35v-29.08a0.4 0.4 0 0 1 0.6-0.34l102.34 59.33a0.4 0.4 0 0 1 0 0.7l-102.34 59.3a0.4 0.4 0 0 1-0.6-0.34v-29.07a0.4 0.4 0 0 1 0.2-0.35l50.99-29.54a0.4 0.4 0 0 0 0-0.7z"></path>
+ </g>
+</svg>
+</svg>
