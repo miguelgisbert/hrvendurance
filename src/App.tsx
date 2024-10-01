@@ -117,7 +117,7 @@ function App() {
             <TrainingTable translations={translations} />
           </Grid>
 
-          <Grid container alignItems="stretch" justifyContent="center" padding="30px" marginBottom="700px" spacing={"30px"} sx={{ color: theme => theme.palette.primary.main }}>
+          <Grid container alignItems="stretch" justifyContent="center" padding="30px" marginBottom="100px" spacing={"30px"} sx={{ color: theme => theme.palette.primary.main }}>
             <Grid item xs={4} maxWidth="350px!important" sx={{ display:"flex" }}>
               <Card sx={{ flex:1, maxWidth:"300px", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
                 <Typography component="h1" sx={{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.Measure}</Typography>
@@ -138,8 +138,8 @@ function App() {
             </Grid>
           </Grid>
 
-          <Grid container>
-            <Survey />
+          <Grid container alignItems="stretch" justifyContent="center" padding="30px" marginBottom="100px">
+            <Survey theme={currentTheme} translations={translations}/>
           </Grid>
           
         </Grid>    

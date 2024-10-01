@@ -28,7 +28,9 @@ const translations: Translations = {
       Suggestion: "Suggestion",
       Rest: "Rest",
       LowIntensity: "Low Intensity",
-      HighIntensity: "High Intensity"
+      HighIntensity: "High Intensity",
+      GetInvolved: "Get involved!",
+      EnterSurvey: "Fill in our survey and get full premium access forever"
     },
     es: {
       greeting: "En construcción...",
@@ -51,7 +53,9 @@ const translations: Translations = {
       Suggestion: "Recomendación",
       Rest: "Descanso",
       LowIntensity: "Baja Intensidad",
-      HighIntensity: "Alta Intensidad"
+      HighIntensity: "Alta Intensidad",
+      GetInvolved: "Participa!",
+      EnterSurvey: "Responde a nuestra encuesta y obtén acceso premium gratis ¡para siempre!"
     },
     ca: {
       greeting: "En construcció...",
@@ -74,7 +78,9 @@ const translations: Translations = {
       Suggestion: "Recomanació",
       Rest: "Descans",
       LowIntensity: "Baixa Intensitat",
-      HighIntensity: "Alta Intensitat"
+      HighIntensity: "Alta Intensitat",
+      GetInvolved: "Participa!",
+      EnterSurvey: "Ompli la nostra enquesta i aconsegueix accés premium gratuit per a sempre!"
     }
 };
 
