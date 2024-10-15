@@ -1,10 +1,25 @@
 import { useState, FC } from 'react'
-import { TextField, Button, Box, Card, Theme, Typography } from '@mui/material'
+import { TextField, Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper } from '@mui/material'
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import ReactCardFlip from 'react-card-flip'
 
-const firebaseConfig = {
+const steps = [
+  {
+    label: 'Step 1',
+    description: `Persona data`,
+  },
+  {
+    label: 'Step 2',
+    description:
+      'Training data',
+  },
+  {
+    label: 'Step 3',
+    description: `Habits data`,
+  },
+]
+
+const firebaseConfig  =  {
   apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
   authDomain: "hrv-endurance-landing.firebaseapp.com",
   projectId: "hrv-endurance-landing",
@@ -16,21 +31,35 @@ const firebaseConfig = {
 
 interface SurveyProps {
   theme: Theme
-  translations: { greeting: string }
+  translations: { GetInvolved: String, EnterSurvey: String}
 }
 
-const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
+const app  =  initializeApp(firebaseConfig)
+const db  =  getFirestore(app)
 
-const Survey: FC<SurveyProps> = ({ theme, translations }) => {
-  const cardBackground = theme.myBackground.cardBackground
-  // const cardShadow = theme.palette.background.cardShadow
-  const shadowColor = theme.myBackground.cardShadow
-  const [input, setInput] = useState('')
-  const [isFlipped, setIsFlipped] = useState<boolean>(false)
+const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
+  const cardBackground  =  theme.myBackground.cardBackground
+  // const cardShadow  =  theme.palette.background.cardShadow
+  const shadowColor  =  theme.myBackground.cardShadow
+  const [input, setInput]  =  useState('')
+  const [isFlipped, setIsFlipped]  =  useState<boolean>(false)
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const [activeStep, setActiveStep] = useState(0)
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+  }
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+  }
+
+  const handleReset = () => {
+    setActiveStep(0)
+  }
+
+  const handleSubmit  =  async (event: React.FormEvent<HTMLFormElement>)  => {
+    event.preventDefault()
 
     try {
       await addDoc(collection(db, 'surveys'), {
@@ -44,25 +73,54 @@ const Survey: FC<SurveyProps> = ({ theme, translations }) => {
   }
 
   return (
-    <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
-      <Card onMouseOver={() => setIsFlipped(true)} sx={{ width:"100%", height:"300px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
-        <Typography component="h1" sx={{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
+      <Card onMouseOver = {()  => setIsFlipped(true)} sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
+        <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
         <Typography>{translations.EnterSurvey}</Typography>
-      </Card>
-      <Card onMouseOut={() => setIsFlipped(false)} sx={{ width:"100%", height:"300px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
-        <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
-          <TextField
-            id="outlined-basic"
-            label="Pregunta de l'enquesta"
-            variant="outlined"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <Button type="submit" variant="contained">Enviar</Button>
+        <Box sx={{ maxWidth: 400 }}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((step, index) => (
+              <Step key={step.label}>
+                <StepLabel
+                  optional={
+                    index === steps.length - 1 ? (
+                      <Typography variant="caption">Last step</Typography>
+                    ) : null
+                  }
+                >
+                  {step.label}
+                </StepLabel>
+                <StepContent>
+                  <Typography>{step.description}</Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Button
+                      variant="contained"
+                      onClick={handleNext}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                    </Button>
+                    <Button
+                      disabled={index === 0}
+                      onClick={handleBack}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Back
+                    </Button>
+                  </Box>
+                </StepContent>
+              </Step>
+            ))}
+          </Stepper>
+          {activeStep === steps.length && (
+            <Paper square elevation={0} sx={{ p: 3 }}>
+              <Typography>All steps completed - you&apos;re finished</Typography>
+              <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
+                Reset
+              </Button>
+            </Paper>
+          )}
         </Box>
       </Card>
-    </ReactCardFlip> 
-
     
   )
 }
