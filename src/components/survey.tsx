@@ -1,7 +1,7 @@
 import { useState, FC } from 'react'
-import { TextField, Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper } from '@mui/material'
-import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper } from '@mui/material'
+// import { initializeApp } from 'firebase/app'
+// import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const steps = [
   {
@@ -19,30 +19,29 @@ const steps = [
   },
 ]
 
-const firebaseConfig  =  {
-  apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
-  authDomain: "hrv-endurance-landing.firebaseapp.com",
-  projectId: "hrv-endurance-landing",
-  storageBucket: "hrv-endurance-landing.appspot.com",
-  messagingSenderId: "228357777566",
-  appId: "1:228357777566:web:9120c54e80fecf3ce3b38f",
-  measurementId: "G-80B1PFKXX5"
-}
+// const firebaseConfig  =  {
+//   apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
+//   authDomain: "hrv-endurance-landing.firebaseapp.com",
+//   projectId: "hrv-endurance-landing",
+//   storageBucket: "hrv-endurance-landing.appspot.com",
+//   messagingSenderId: "228357777566",
+//   appId: "1:228357777566:web:9120c54e80fecf3ce3b38f",
+//   measurementId: "G-80B1PFKXX5"
+// }
 
 interface SurveyProps {
   theme: Theme
   translations: { GetInvolved: String, EnterSurvey: String}
 }
 
-const app  =  initializeApp(firebaseConfig)
-const db  =  getFirestore(app)
+// const app  =  initializeApp(firebaseConfig)
+// const db  =  getFirestore(app)
 
 const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const cardBackground  =  theme.myBackground.cardBackground
   // const cardShadow  =  theme.palette.background.cardShadow
   const shadowColor  =  theme.myBackground.cardShadow
-  const [input, setInput]  =  useState('')
-  const [isFlipped, setIsFlipped]  =  useState<boolean>(false)
+  // const [input, setInput]  =  useState('')
 
   const [activeStep, setActiveStep] = useState(0)
 
@@ -58,22 +57,22 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     setActiveStep(0)
   }
 
-  const handleSubmit  =  async (event: React.FormEvent<HTMLFormElement>)  => {
-    event.preventDefault()
+  // const handleSubmit  =  async (event: React.FormEvent<HTMLFormElement>)  => {
+  //   event.preventDefault()
 
-    try {
-      await addDoc(collection(db, 'surveys'), {
-        response: input,
-        timestamp: serverTimestamp(),
-      })
-      setInput('')
-    } catch (error) {
-      console.error('Error afegint la resposta a Firestore: ', error)
-    }
-  }
+  //   try {
+  //     await addDoc(collection(db, 'surveys'), {
+  //       response: input,
+  //       timestamp: serverTimestamp(),
+  //     })
+  //     setInput('')
+  //   } catch (error) {
+  //     console.error('Error afegint la resposta a Firestore: ', error)
+  //   }
+  // }
 
   return (
-      <Card onMouseOver = {()  => setIsFlipped(true)} sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
+      <Card sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
         <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
         <Typography>{translations.EnterSurvey}</Typography>
         <Box sx={{ maxWidth: 400 }}>
