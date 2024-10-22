@@ -30,8 +30,15 @@ const translations: Translations = {
       LowIntensity: "Low Intensity",
       HighIntensity: "High Intensity",
       GetInvolved: "Get involved!",
-      EnterSurvey: "Fill in our survey and get full premium access forever"
+      EnterSurvey: "Fill in our survey and get full premium access forever",
+
+      // Survey form
+      PersonalData: "Personal Data",
+      Name: "Full Name",
+      Email: "Email",
+      Phone: "Phone",
     },
+
     es: {
       greeting: "En construcción...",
       Measure: "Mide",
@@ -55,8 +62,15 @@ const translations: Translations = {
       LowIntensity: "Baja Intensidad",
       HighIntensity: "Alta Intensidad",
       GetInvolved: "Participa!",
-      EnterSurvey: "Responde a nuestra encuesta y obtén acceso premium gratis ¡para siempre!"
+      EnterSurvey: "Responde a nuestra encuesta y obtén acceso premium gratis ¡para siempre!",
+
+      // Survey form
+      PersonalData: "Datos personales",
+      Name: "Nombre y apellidos",
+      Email: "Email",
+      Phone: "Teléfono",
     },
+
     ca: {
       greeting: "En construcció...",
       Measure: "Mesura",
@@ -80,7 +94,14 @@ const translations: Translations = {
       LowIntensity: "Baixa Intensitat",
       HighIntensity: "Alta Intensitat",
       GetInvolved: "Participa!",
-      EnterSurvey: "Ompli la nostra enquesta i aconsegueix accés premium gratuit per a sempre!"
+      EnterSurvey: "Ompli la nostra enquesta i aconsegueix accés premium gratuït per sempre!",
+
+      // Survey form
+      PersonalData: "Dades Personals",
+      Name: "Nom i cognoms",
+      Email: "Email",
+      Phone: "Telèfon",
+
     }
 };
 

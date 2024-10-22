@@ -1,23 +1,8 @@
 import { useState, FC } from 'react'
-import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper } from '@mui/material'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid } from '@mui/material'
 // import { initializeApp } from 'firebase/app'
 // import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
-const steps = [
-  {
-    label: 'Step 1',
-    description: `Persona data`,
-  },
-  {
-    label: 'Step 2',
-    description:
-      'Training data',
-  },
-  {
-    label: 'Step 3',
-    description: `Habits data`,
-  },
-]
 
 // const firebaseConfig  =  {
 //   apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
@@ -57,6 +42,28 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     setActiveStep(0)
   }
 
+  const steps = [
+    {
+      label: translations.PersonalData,
+      description: (
+        <Grid container spacing="20px" justifyContent={"center"}>
+          <Grid item size={{xs:12, md:4}}><TextField id="name" label={translations.Name} variant="outlined" /></Grid>
+          <Grid item size={{xs:12, md:4}}><TextField id="email" label={translations.Email} variant="outlined" /></Grid>
+          <Grid item size={{xs:12, md:4}}><TextField id="phone" label={translations.Phone} variant="outlined" /></Grid>
+        </Grid>
+      ),
+    },
+    {
+      label: 'Step 2',
+      description:
+        'Training data',
+    },
+    {
+      label: 'Step 3',
+      description: `Habits data`,
+    },
+  ]
+
   // const handleSubmit  =  async (event: React.FormEvent<HTMLFormElement>)  => {
   //   event.preventDefault()
 
@@ -75,7 +82,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       <Card sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
         <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
         <Typography>{translations.EnterSurvey}</Typography>
-        <Box sx={{ maxWidth: 400 }}>
+        <Box component="form" noValidate>
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map((step, index) => (
               <Step key={step.label}>
@@ -89,7 +96,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   {step.label}
                 </StepLabel>
                 <StepContent>
-                  <Typography>{step.description}</Typography>
+                  {step.description}
                   <Box sx={{ mb: 2 }}>
                     <Button
                       variant="contained"

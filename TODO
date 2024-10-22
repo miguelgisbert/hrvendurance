@@ -1,4 +1,10 @@
 ✔ Fix errors on npm run build @done(24-10-01 15:35)
 ✔ Firebase deploy @done(24-10-01 15:35)
 
-☐ Create MUI Stepper for Survey
+✔ Create MUI Stepper for Survey @done(24-10-15 20:25)
+☐ Complete Survey inputs
+☐ Create fields data saving
+
+☐ Mobile view for header
+☐ Mobile view for main
+☐ Mobile view for training table
