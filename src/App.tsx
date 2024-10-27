@@ -32,8 +32,6 @@ function App() {
   const cardBackground  =  currentTheme.myBackground.cardBackground
   // const cardShadow  =  currentTheme.palette.background.cardShadow
   const shadowColor  =  currentTheme.myBackground.cardShadow
-
-  console.log(cardBackground)
   
   const toggleThemeMode  =  ()  => {
     setThemeMode((prevMode)  => (prevMode  ===  'light' ? 'dark' : 'light'))

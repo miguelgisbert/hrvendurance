@@ -1,5 +1,8 @@
-import { useState, FC } from 'react'
-import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid } from '@mui/material'
+import { useState, FC, useEffect } from 'react'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormLabel } from '@mui/material'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 // import { initializeApp } from 'firebase/app'
 // import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
@@ -33,23 +36,72 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
   }
-
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1)
   }
-
   const handleReset = () => {
     setActiveStep(0)
   }
+
+  const [name, setName] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
+  const [emailError, setEmailError] = useState<boolean>(false)
+  const [phoneError, setPhoneError] = useState<boolean>(false)
+
+  const validateEmail = (value: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(value)) {
+      setEmailError(true)
+    } else {
+      setEmailError(false)
+    }
+  }
+
+  const validatePhone = (value: string) => {
+    const phonePattern = /^[+()\-0-9\s]{9,24}$/
+    if (!phonePattern.test(value)) {
+      setPhoneError(true)
+    } else {
+      setPhoneError(false)
+    }
+  }
+
+  useEffect(()=>{
+    validateEmail(email)
+  },[email])
+
+  useEffect(()=>{
+    validatePhone(phone)
+  },[phone])
 
   const steps = [
     {
       label: translations.PersonalData,
       description: (
-        <Grid container spacing="20px" justifyContent={"center"}>
-          <Grid item size={{xs:12, md:4}}><TextField id="name" label={translations.Name} variant="outlined" /></Grid>
-          <Grid item size={{xs:12, md:4}}><TextField id="email" label={translations.Email} variant="outlined" /></Grid>
-          <Grid item size={{xs:12, md:4}}><TextField id="phone" label={translations.Phone} variant="outlined" /></Grid>
+        <Grid container spacing="20px" marginTop="10px" justifyContent={"center"}>
+          <Grid item size={{xs:12, md:4}}><TextField id="name" value={name} onChange={(e)=>setName(e.target.value)} label={translations.Name} variant="outlined" /></Grid>
+          <Grid item size={{xs:12, md:4}}><TextField id="email" value={email} onChange={(e)=>setEmail(e.target.value)} error={emailError && email!=''} label={translations.Email} variant="outlined" /></Grid>
+          <Grid item size={{xs:12, md:4}}><TextField id="phone" value={phone} onChange={(e)=>setPhone(e.target.value)} error={phoneError && phone!=''} label={translations.Phone} variant="outlined" /></Grid>
+          <Grid item size={{xs:12, md:4}} components={['DatePicker']}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label={translations.Birthday} />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item size={{xs:12, md:4}}>
+            <FormControl>
+              <FormLabel id="gender">{translations.Gender}</FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="female"
+                name="radio-buttons-group"
+              >
+                <FormControlLabel value="female" control={<Radio />} label={translations.Female} />
+                <FormControlLabel value="male" control={<Radio />} label={translations.Male} />
+                <FormControlLabel value="other" control={<Radio />} label={translations.Other} />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
         </Grid>
       ),
     },
@@ -101,16 +153,17 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                     <Button
                       variant="contained"
                       onClick={handleNext}
-                      sx={{ mt: 1, mr: 1 }}
+                      disabled={name==='' || email==='' || phone==='' || emailError || phoneError} 
+                      sx={{ mt: 3, mr: 1 }}
                     >
-                      {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                      {index === steps.length - 1 ? translations.Send : translations.Continue}
                     </Button>
                     <Button
                       disabled={index === 0}
                       onClick={handleBack}
-                      sx={{ mt: 1, mr: 1 }}
+                      sx={{ mt: 3, ml: 3 }}
                     >
-                      Back
+                      {translations.Back}
                     </Button>
                   </Box>
                 </StepContent>

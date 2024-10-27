@@ -31,12 +31,20 @@ const translations: Translations = {
       HighIntensity: "High Intensity",
       GetInvolved: "Get involved!",
       EnterSurvey: "Fill in our survey and get full premium access forever",
-
+      
       // Survey form
       PersonalData: "Personal Data",
       Name: "Full Name",
       Email: "Email",
       Phone: "Phone",
+      Continue: "Continue",
+      Back: "Back",
+      Enviar: "Send",
+      Birthday: "Birthday",
+      Gender: "Gender",
+      Female: "Female",
+      Male: "Male",
+      Other: "Other"
     },
 
     es: {
@@ -69,6 +77,14 @@ const translations: Translations = {
       Name: "Nombre y apellidos",
       Email: "Email",
       Phone: "Teléfono",
+      Continue: "Continuar",
+      Back: "Atrás",
+      Send: "Enviar",
+      Birthday: "Fecha de nacimiento",
+      Gender: "Género",
+      Female: "Mujer",
+      Male: "Hombre",
+      Other: "Otro"
     },
 
     ca: {
@@ -101,7 +117,14 @@ const translations: Translations = {
       Name: "Nom i cognoms",
       Email: "Email",
       Phone: "Telèfon",
-
+      Continue: "Continuar",
+      Back: "Arrere",
+      Send: "Enviar",
+      Birthday: "Data de neixement",
+      Gender: "Gènere",
+      Female: "Dona",
+      Male: "Home",
+      Other: "Altre"
     }
 };
 
