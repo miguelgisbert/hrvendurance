@@ -1,10 +1,4 @@
-interface LanguageTranslations {
-  [key: string]: string;
-}
-
-interface Translations {
-  [key: string]: LanguageTranslations;
-}
+import { Translations } from "./types";
 
 const translations: Translations = {
     en: {

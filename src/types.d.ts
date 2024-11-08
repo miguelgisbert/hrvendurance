@@ -20,6 +20,12 @@ export type MyThemeOptions = ThemeOptions & {
   
 export type Language = 'en' | 'es' | 'ca';
 
+export interface Translations {
+    [key: string]: {
+      [key: string]: string;
+    };
+}
+
 declare module '@mui/material/styles' {
     export interface Theme {
         myBackground: {
