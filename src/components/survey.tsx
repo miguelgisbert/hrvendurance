@@ -1,5 +1,5 @@
 import { useState, FC, useEffect } from 'react'
-import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel } from '@mui/material'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormGroup, Checkbox, FormLabel } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -112,7 +112,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
             />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={12}>
             <FormControl sx={{ width:"100%" }}>
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
@@ -132,8 +132,20 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     },
     {
       label: 'Step 2',
-      description:
-        'Training data',
+      description: (
+        <Grid container spacing="20px" marginTop="10px" justifyContent={"center"}>
+          <Grid item xs={12} md={4}>
+            <FormGroup sx={{ width: "100%" }}>
+              <FormLabel component="legend">Lo mío es más...</FormLabel>
+              <FormControlLabel control={<Checkbox />} label="La montaña" />
+              <FormControlLabel control={<Checkbox />} label="El asfalto" />
+              <FormControlLabel control={<Checkbox />} label="Sólo corro para estar en forma o perder peso" />
+              <FormControlLabel control={<Checkbox />} label="Ciclismo" />
+              <FormControlLabel control={<Checkbox />} label="Triatlón" />
+            </FormGroup>
+          </Grid>
+        </Grid>
+      )
     },
     {
       label: 'Step 3',
