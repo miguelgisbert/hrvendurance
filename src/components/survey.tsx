@@ -33,7 +33,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const shadowColor  =  theme.myBackground.cardShadow
   // const [input, setInput]  =  useState('')
 
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(1)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -45,14 +45,34 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     setActiveStep(0)
   }
 
+  // Survay data
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [birthday, setBirthday] = useState<Date | null>(null)
   const [gender, setGender] = useState<'male' | 'female' | 'other' | null>(null)
+  const [selectedOptionsGroup1, setSelectedOptionsGroup1] = useState<string[]>([])
+  const [selectedOptionsGroup2, setSelectedOptionsGroup2] = useState<string[]>([])
+  const [trainingProblems, setTrainingProblems] = useState<string>('')
+  
+  const handleCheckboxChangeGroup1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSelectedOptionsGroup1(prev =>
+      prev.includes(value) ? prev.filter(option => option !== value) : [...prev, value]
+    );
+  };
+  
+  const handleCheckboxChangeGroup2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSelectedOptionsGroup2(prev =>
+      prev.includes(value) ? prev.filter(option => option !== value) : [...prev, value]
+    );
+  };
+
+  // Data validation
   const [emailError, setEmailError] = useState<boolean>(false)
   const [phoneError, setPhoneError] = useState<boolean>(false)
-  const [dateError, setDateError] = useState(false);
+  const [dateError, setDateError] = useState(false)
 
   const validateEmail = (value: string) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -71,6 +91,16 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       setPhoneError(false)
     }
   }
+
+  const [showOtherOption, setShowOtherOption] = useState(false)
+  const [otherOptionText, setOtherOptionText] = useState('')
+
+  const handleOtherOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowOtherOption(event.target.checked);
+    if (!event.target.checked) {
+      setOtherOptionText('');
+    }
+  };
 
   useEffect(()=>{
     validateEmail(email)
@@ -92,6 +122,15 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       dateError
     );
   };
+
+  const isStep2Invalid = () => {
+  return (
+    selectedOptionsGroup1.length === 0 ||
+    (selectedOptionsGroup2.length === 0 && !showOtherOption) ||
+    (showOtherOption && otherOptionText === '') ||
+    trainingProblems === ''
+  );
+};
 
   const steps = [
     {
@@ -131,20 +170,73 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       ),
     },
     {
-      label: 'Step 2',
+      label: 'Entrenamiento',
       description: (
-        <Grid container spacing="20px" marginTop="10px" justifyContent={"center"}>
-          <Grid item xs={12} md={4}>
-            <FormGroup sx={{ width: "100%" }}>
-              <FormLabel component="legend">Lo mío es más...</FormLabel>
-              <FormControlLabel control={<Checkbox />} label="La montaña" />
-              <FormControlLabel control={<Checkbox />} label="El asfalto" />
-              <FormControlLabel control={<Checkbox />} label="Sólo corro para estar en forma o perder peso" />
-              <FormControlLabel control={<Checkbox />} label="Ciclismo" />
-              <FormControlLabel control={<Checkbox />} label="Triatlón" />
-            </FormGroup>
+        <>
+          <Grid container spacing="20px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
+            <Grid item xs={12} md={6}>
+              <FormGroup sx={{ width: "auto" }}>
+                <FormLabel component="legend" style={{marginBottom: "10px"}}>Lo mío es más...</FormLabel>
+                <FormControlLabel control={<Checkbox value="La montaña" onChange={handleCheckboxChangeGroup1}/>} label="La montaña" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="El asfalto" onChange={handleCheckboxChangeGroup1}/>} label="El asfalto" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="Sólo corro" onChange={handleCheckboxChangeGroup1}/>} label="Sólo corro para estar en forma o perder peso" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="Ciclismo" onChange={handleCheckboxChangeGroup1}/>} label="Ciclismo" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="Triatlón" onChange={handleCheckboxChangeGroup1}/>} label="Triatlón" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormGroup sx={{ width: "auto" }}>
+                <FormLabel component="legend">¿Has hecho alguna vez una planificación de tu entrenamiento? (puedes seleccionar varias opciones y/o escribir otra respuesta)</FormLabel>
+                <FormControlLabel control={<Checkbox value="Sí, por mi cuenta." onChange={handleCheckboxChangeGroup2} />} label="Sí, por mi cuenta." sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="Sí, con entrenador/a personal" onChange={handleCheckboxChangeGroup2} />} label="Sí, con entrenador/a personal" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="No por escrito pero sí tengo en cuenta lo que hago (entreno por sensaciones)" onChange={handleCheckboxChangeGroup2} />} label="No por escrito pero sí tengo en cuenta lo que hago (entreno por sensaciones)" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="No planifico, voy improvisando según lo que me apetece" onChange={handleCheckboxChangeGroup2} />} label="No planifico, voy improvisando según lo que me apetece" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel
+                  control={<Checkbox checked={showOtherOption} onChange={handleOtherOptionChange} />}
+                  label="Otra opción" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}
+                />
+                {showOtherOption && (
+                  <TextField
+                    value={otherOptionText}
+                    onChange={(e) => setOtherOptionText(e.target.value)}
+                    label="Otra opción"
+                    variant="outlined"
+                    sx={{ marginTop: 2 }}
+                  />
+                )}
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12}>
+            <TextField
+              multiline
+              rows={4}
+              value={trainingProblems}
+              onChange={(e) => setTrainingProblems(e.target.value)}
+              sx={{
+                width: "100%",
+                '& .MuiInputLabel-root': {
+                  whiteSpace: 'normal',
+                  wordWrap: 'break-word',
+                  marginBottom: '8px', // Afegeix un marge inferior per separar el label del TextField
+                },
+                '@media (max-width:1024px)': {
+                  '& .MuiInputLabel-root': {
+                    position: 'relative',
+                    transform: 'none',
+                  },
+                },
+              }}
+              label="¿Has encontrado algún problema o dificultad en cuanto a planificación-resultados? ¿Le has buscado solución? ¿Cuál?"
+              InputLabelProps={{
+                sx: {
+                  whiteSpace: 'normal',
+                  wordWrap: 'break-word',
+                },
+              }}
+            />
+            </Grid>
           </Grid>
-        </Grid>
+        </>
       )
     },
     {
@@ -202,7 +294,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                     <Button
                       variant="contained"
                       onClick={index === steps.length - 1 ? handleSubmit : handleNext}
-                      disabled={isStep1Invalid()} 
+                      disabled={activeStep === 0 ? isStep1Invalid() : activeStep === 1 ? isStep2Invalid() : false} 
                       sx={{ mt: 3, mr: 1 }}
                     >
                       {index === steps.length - 1 ? translations.Send : translations.Continue}
