@@ -1,17 +1,23 @@
 import 'react-native-reanimated';
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, Dimensions } from 'react-native';
-import { Camera } from 'expo-camera';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Button, Dimensions, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import Constants from 'expo-constants';
+import { Camera, CameraType } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
 import { LineChart } from 'react-native-chart-kit';
 import { useColorScheme } from './hooks/useColorScheme';
 import { ThemeProvider } from '@react-navigation/native';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import { Stack } from 'expo-router';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import { MaterialIcons } from '@expo/vector-icons';
 
 SplashScreen.preventAutoHideAsync();
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const colorScheme = useColorScheme();
@@ -34,94 +40,153 @@ export default function App() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      </Stack.Navigator>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
 
 function HomeScreen() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [cameraRef, setCameraRef] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(CameraType.back);
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+  const cameraRef = useRef<Camera>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<number[]>([]);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
+      await MediaLibrary.requestPermissionsAsync();
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === 'granted');
     })();
   }, []);
 
-  const startRecording = () => {
-    setIsRecording(true);
-    // Simulació de dades PPG
-    const interval = setInterval(() => {
-      setData((prevData) => [...prevData, Math.random() * 100]);
-    }, 100);
-    setTimeout(() => {
-      clearInterval(interval);
-      setIsRecording(false);
-    }, 10000); // Atura la gravació després de 10 segons
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      try {
+        const data = await cameraRef.current.takePictureAsync();
+        console.log(data);
+        setImage(data.uri);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
-  if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
+  const savePicture = async () => {
+    if (image) {
+      try {
+        const asset = await MediaLibrary.createAssetAsync(image);
+        alert('Picture saved! 🎉');
+        setImage(null);
+        console.log('saved successfully');
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  if (hasCameraPermission === false) {
     return <Text>No access to camera</Text>;
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Camera style={{ flex: 1 }} type={Camera.Constants.Type.back} ref={(ref) => setCameraRef(ref)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'transparent',
-            flexDirection: 'row',
-          }}>
-          <Button title={isRecording ? "Recording..." : "Start Recording"} onPress={startRecording} disabled={isRecording} />
-        </View>
-      </Camera>
-      <View style={{ height: 200 }}>
-        <LineChart
-          data={{
-            datasets: [
-              {
-                data: data,
-              },
-            ],
-          }}
-          width={Dimensions.get('window').width} // from react-native
-          height={220}
-          yAxisLabel=""
-          yAxisSuffix=""
-          chartConfig={{
-            backgroundColor: '#e26a00',
-            backgroundGradientFrom: '#fb8c00',
-            backgroundGradientTo: '#ffa726',
-            decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726',
-            },
-          }}
-          bezier
-          style={{
-            marginVertical: 8,
-            borderRadius: 16,
-          }}
-        />
+    <View style={styles.container}>
+      {!image ? (
+        <Camera
+          style={styles.camera}
+          type={type}
+          ref={cameraRef}
+          flashMode={flash}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 30,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                setType(
+                  type === CameraType.back ? CameraType.front : CameraType.back
+                );
+              }}
+            >
+              <MaterialIcons name="flip-camera-android" size={24} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setFlash(
+                  flash === Camera.Constants.FlashMode.off
+                    ? Camera.Constants.FlashMode.on
+                    : Camera.Constants.FlashMode.off
+                )
+              }
+            >
+              <MaterialIcons name="flash-on" size={24} color={flash === Camera.Constants.FlashMode.off ? 'gray' : 'white'} />
+            </TouchableOpacity>
+          </View>
+        </Camera>
+      ) : (
+        <Image source={{ uri: image }} style={styles.camera} />
+      )}
+
+      <View style={styles.controls}>
+        {image ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 50,
+            }}
+          >
+            <Button title="Re-take" onPress={() => setImage(null)} />
+            <Button title="Save" onPress={savePicture} />
+          </View>
+        ) : (
+          <Button title="Take a picture" onPress={takePicture} />
+        )}
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: Constants.statusBarHeight,
+    backgroundColor: '#000',
+    padding: 8,
+  },
+  controls: {
+    flex: 0.5,
+  },
+  button: {
+    height: 40,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#E9730F',
+    marginLeft: 10,
+  },
+  camera: {
+    flex: 5,
+    borderRadius: 20,
+  },
+  topControls: {
+    flex: 1,
+  },
+});

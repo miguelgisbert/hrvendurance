@@ -1,5 +1,5 @@
 import { useState, FC, useEffect } from 'react'
-import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormGroup, Checkbox, FormLabel } from '@mui/material'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormGroup, Checkbox, FormLabel, Rating, Switch } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -33,7 +33,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const shadowColor  =  theme.myBackground.cardShadow
   // const [input, setInput]  =  useState('')
 
-  const [activeStep, setActiveStep] = useState(1)
+  const [activeStep, setActiveStep] = useState(3)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -54,6 +54,28 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const [selectedOptionsGroup1, setSelectedOptionsGroup1] = useState<string[]>([])
   const [selectedOptionsGroup2, setSelectedOptionsGroup2] = useState<string[]>([])
   const [trainingProblems, setTrainingProblems] = useState<string>('')
+  const [performanceInterest, setPerformanceInterest] = useState<number | null>(null)
+  const [riskInterest, setRiskInterest] = useState<number | null>(null)
+  const [performanceInterest_Hover, setPerformanceInterest_Hover] = useState(-1);
+  const [riskInterest_Hover, setRiskInterest_Hover] = useState(-1);
+  const [havePaidApp, setHavePaidApp] = useState<"yes" | "no" | null>(null)
+  const [whichApp, setWhichApp] = useState<string>('')
+  const [thinkAboutPayApp, setThinkAboutPayApp] = useState<"yes" | "no" | null>(null)
+  const [knowHRV, setKnowHRV] = useState<"yes" | "no" | null>(null)
+  const [hrvAppInterest, setHrvAppInterest] = useState<number | null>(null)
+  const [hrvAppInterest_Hover, setHrvAppInterest_Hover] = useState(-1);
+  const [payHrvAppInterest, setPayHrvAppInterest] = useState<number | null>(null)
+  const [payHrvAppInterest_Hover, setPayHrvAppInterest_Hover] = useState(-1);
+  const [whyHrvAppInterest, setWhyHrvAppInterest] = useState<string>('')
+  const [whyPayHrvAppInterest, setWhyPayHrvAppInterest] = useState<string>('')
+
+  const interest_Labels: { [index: string]: string } = {
+    1: 'Nada',
+    2: 'Muy poco',
+    3: 'Algo',
+    4: 'Bastante',
+    5: 'Mucho',
+  };
   
   const handleCheckboxChangeGroup1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -240,9 +262,173 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       )
     },
     {
-      label: 'Step 3',
-      description: `Habits data`,
+      label: 'Intereses',
+      description: (
+        <>
+          <Grid container spacing="20px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
+            <Grid item xs={12} md={6}>
+              <Typography component="legend">¿Cuánto interés tienes en mejorar tu rendimiento?</Typography>
+              <Grid container direction={"row"} gap={2}>
+                <Rating
+                  name="performanceInterest"
+                  value={performanceInterest}
+                  onChange={(_event, newValue) => {
+                    setPerformanceInterest(newValue);
+                  }}
+                  onChangeActive={(_event, newHover) => {
+                    setPerformanceInterest_Hover(newHover);
+                  }}
+                />
+                {performanceInterest !== null && (
+                  <Typography>{interest_Labels[performanceInterest_Hover !== -1 ? performanceInterest_Hover : performanceInterest]}</Typography>
+                )}
+              </Grid>
+              <Typography component="legend">¿Cuánto te preocupa un posible riesgo cardíaco mientras corres?</Typography>
+              <Grid container direction={"row"} gap={2}>
+                <Rating
+                  name="performanceInterest"
+                  value={riskInterest}
+                  onChange={(_event, newValue) => {
+                    setRiskInterest(newValue);
+                  }}
+                  onChangeActive={(_event, newHover) => {
+                    setRiskInterest_Hover(newHover);
+                  }}
+                />
+                {riskInterest !== null && (
+                  <Typography>{interest_Labels[riskInterest_Hover !== -1 ? riskInterest_Hover : riskInterest]}</Typography>
+                )}
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Typography component="legend">¿Pagas o has pagado alguna vez la suscripción premium de alguna app deportiva?</Typography>
+              <RadioGroup
+                name="havePaidApp"
+                value={havePaidApp}
+                onChange={(event) => {
+                  setHavePaidApp(event.target.value as "yes" | "no");
+                }}
+              >
+                <FormControlLabel value="yes" control={<Radio />} label="Sí" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
+              </RadioGroup>
+              {havePaidApp === "no" && (
+                <>
+                  <Typography component="legend">¿Te lo has planteado?</Typography>
+                  <RadioGroup
+                    name="thinkAboutPayApp"
+                    value={thinkAboutPayApp}
+                    onChange={(event) => {
+                      setThinkAboutPayApp(event.target.value as "yes" | "no");
+                    }}
+                    >
+                    <FormControlLabel value="yes" control={<Radio />} label="Sí" />
+                    <FormControlLabel value="no" control={<Radio />} label="No" />
+                  </RadioGroup>
+                </>
+              )}
+              {(havePaidApp === "yes" || thinkAboutPayApp === "yes") && (
+                <TextField
+                  value={whichApp}
+                  onChange={(e) => setWhichApp(e.target.value)}
+                  label="¿Cuál?"
+                  variant="outlined"
+                  sx={{ marginTop: 2, width: "100%" }}
+                />
+              )}
+            </Grid>
+          </Grid>
+        </>
+      ),
     },
+    {
+      label: 'HRV',
+      description: (
+        <>
+          <Grid container spacing="80px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
+            <Grid item xs={12} md={6} display={"flex"} flexDirection={"column"} gap={2}>
+
+              <Typography component="legend">¿Has oído hablar de la Variabilidad de Frecuencia Cardíaca? (HRV en inglés)</Typography>
+              <RadioGroup
+                name="knowHRV"
+                value={knowHRV}
+                onChange={(event) => {
+                  setKnowHRV(event.target.value as "yes" | "no");
+                }}
+                >
+                <FormControlLabel value="yes" control={<Radio />} label="Sí" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
+              </RadioGroup>
+
+              <Grid item xs={12} sx={{display: {xs:'block', md:'none'}}}>
+                <Typography component="legend">Te explico brevemente qué es y cómo puede ayudar en un entrenamiento de resistencia en este vídeo de 1 minuto y medio.</Typography>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+              </Grid>
+              
+              <Grid container direction={"row"} gap={2}>
+                <Typography component="legend">Después de ver el vídeo, ¿cuánto interés tendrías en una app para llevar un registro de tu VFC y que te sugiera tu entrenamiento diariamente según tu VFC obteniendo así las ventajas mencionadas en el vídeo?</Typography>
+                <Rating
+                  name="hrvAppInterest"
+                  value={hrvAppInterest}
+                  onChange={(_event, newValue) => {
+                    setHrvAppInterest(newValue);
+                  }}
+                  onChangeActive={(_event, newHover) => {
+                    setHrvAppInterest_Hover(newHover);
+                  }}
+                />
+                {hrvAppInterest !== null && (
+                  <Typography>{interest_Labels[hrvAppInterest_Hover !== -1 ? hrvAppInterest_Hover : hrvAppInterest]}</Typography>
+                )}
+              </Grid>
+              {hrvAppInterest != null && (
+                <TextField
+                  value={whyHrvAppInterest}
+                  onChange={(e) => setWhyHrvAppInterest(e.target.value)}
+                  label="¿Por qué?"
+                  variant="outlined"
+                  sx={{ marginBottom: 2, width: "100%" }}
+                />
+              )}
+
+              <Grid container direction={"row"} gap={2}>
+                <Typography component="legend">¿Cuánta disposición tendrías a pagar una  suscripción premium por esta app? (no podemos saber cuál sería el precio todavía pero orientativamente podría estar en 5 € / mes o 50 € / año)</Typography>
+                <Rating
+                  name="payHrvAppInterest"
+                  value={payHrvAppInterest}
+                  onChange={(_event, newValue) => {
+                    setPayHrvAppInterest(newValue);
+                  }}
+                  onChangeActive={(_event, newHover) => {
+                    setPayHrvAppInterest_Hover(newHover);
+                  }}
+                />
+                {payHrvAppInterest !== null && (
+                  <Typography>{interest_Labels[payHrvAppInterest_Hover !== -1 ? payHrvAppInterest_Hover : payHrvAppInterest]}</Typography>
+                )}
+              </Grid>
+              {payHrvAppInterest != null && (
+                <TextField
+                  value={whyPayHrvAppInterest}
+                  onChange={(e) => setWhyPayHrvAppInterest(e.target.value)}
+                  label="¿Por qué?"
+                  variant="outlined"
+                  sx={{ marginBottom: 2, width: "100%" }}
+                />
+              )}
+
+            </Grid>
+
+            <Grid item md={6} sx={{display: {xs:'none', md:'block'}}}>
+              <Typography component="legend">Te explico brevemente qué es y cómo puede ayudar en un entrenamiento de resistencia en este vídeo de 1 minuto y medio.</Typography>
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+            </Grid>
+
+          </Grid>
+        </>
+      )
+    }
   ]
 
   const handleSubmit  =  async (event: React.MouseEvent<HTMLButtonElement>)  => {
