@@ -1,13 +1,15 @@
 import { useState, FC, useEffect } from 'react'
-import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormGroup, Checkbox, FormLabel, Rating, Switch } from '@mui/material'
+import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepContent, Paper, TextField, Grid, Radio, RadioGroup, FormControl, FormControlLabel, FormGroup, Checkbox, FormLabel, Rating } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import dayjs from 'dayjs';
 import { Translations, Language } from '../types'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore'
-
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 
 const firebaseConfig  =  {
   apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
@@ -31,9 +33,8 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const cardBackground  =  theme.myBackground.cardBackground
   // const cardShadow  =  theme.palette.background.cardShadow
   const shadowColor  =  theme.myBackground.cardShadow
-  // const [input, setInput]  =  useState('')
 
-  const [activeStep, setActiveStep] = useState(3)
+  const [activeStep, setActiveStep] = useState(0)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -70,11 +71,11 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const [whyPayHrvAppInterest, setWhyPayHrvAppInterest] = useState<string>('')
 
   const interest_Labels: { [index: string]: string } = {
-    1: 'Nada',
-    2: 'Muy poco',
-    3: 'Algo',
-    4: 'Bastante',
-    5: 'Mucho',
+    1: translations.nothing,
+    2: translations.low,
+    3: translations.some,
+    4: translations.quiteLot,
+    5: translations.aLot,
   };
   
   const handleCheckboxChangeGroup1 = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,15 +94,26 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
 
   // Data validation
   const [emailError, setEmailError] = useState<boolean>(false)
+  const [emailExists, setEmailExists] = useState<boolean>(false)
   const [phoneError, setPhoneError] = useState<boolean>(false)
   const [dateError, setDateError] = useState(false)
 
-  const validateEmail = (value: string) => {
+  const validateEmail = async (value: string) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailPattern.test(value)) {
       setEmailError(true)
+      setEmailExists(false)
     } else {
-      setEmailError(false)
+      // Check if email already exists
+      const q = query(collection(db, 'surveys'), where('email', '==', value))
+      const querySnapshot = await getDocs(q)
+      if (!querySnapshot.empty) {
+        setEmailError(true)
+        setEmailExists(true)
+      } else {
+        setEmailError(false)
+        setEmailExists(false)
+      }
     }
   }
 
@@ -132,27 +144,101 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     validatePhone(phone)
   },[phone])
 
-  const isStep1Invalid = () => {
-    return (
-      name === '' ||
-      email === '' ||
-      phone === '' ||
-      birthday === null ||
-      gender === null ||
-      emailError ||
-      phoneError ||
-      dateError
-    );
+  const isStepInvalid = (step: number): boolean => {
+    switch (step) {
+      case 0:
+        return (
+          name === '' ||
+          email === '' ||
+          phone === '' ||
+          birthday === null ||
+          gender === null ||
+          emailError ||
+          phoneError ||
+          dateError
+        );
+      case 1:
+        return (
+          selectedOptionsGroup1.length === 0 ||
+          (selectedOptionsGroup2.length === 0 && !showOtherOption) ||
+          (showOtherOption && otherOptionText === '') ||
+          trainingProblems === ''
+        );
+      case 2:
+        return (
+          performanceInterest === null ||
+          riskInterest === null ||
+          havePaidApp === null ||
+          (havePaidApp === "yes" && whichApp === '') ||
+          (havePaidApp === "no" && thinkAboutPayApp === null) ||
+          (thinkAboutPayApp === "yes" && whichApp === '')
+        );
+      case 3:
+        return (
+          knowHRV === null ||
+          hrvAppInterest === null ||
+          payHrvAppInterest === null ||
+          (hrvAppInterest !== null && whyHrvAppInterest === '') ||
+          (payHrvAppInterest !== null && whyPayHrvAppInterest === '')
+        );
+      default:
+        return false;
+    }
   };
+  
+  const handleSubmit  =  async (event: React.MouseEvent<HTMLButtonElement>)  => {
+    event.preventDefault()
 
-  const isStep2Invalid = () => {
-  return (
-    selectedOptionsGroup1.length === 0 ||
-    (selectedOptionsGroup2.length === 0 && !showOtherOption) ||
-    (showOtherOption && otherOptionText === '') ||
-    trainingProblems === ''
-  );
-};
+    try {
+      await addDoc(collection(db, 'surveys'), {
+        name,
+        email,
+        phone,
+        birthday,
+        gender,
+        selectedOptionsGroup1,
+        selectedOptionsGroup2,
+        trainingProblems,
+        performanceInterest,
+        riskInterest,
+        havePaidApp,
+        whichApp,
+        thinkAboutPayApp,
+        knowHRV,
+        hrvAppInterest,
+        payHrvAppInterest,
+        whyHrvAppInterest,
+        whyPayHrvAppInterest,
+        timestamp: serverTimestamp()
+      })
+      handleNext()
+      setName('')
+      setEmail('')
+      setPhone('')
+      setBirthday(null)
+      setGender(null)
+      setSelectedOptionsGroup1([])
+      setSelectedOptionsGroup2([])
+      setTrainingProblems('')
+      setPerformanceInterest(null)
+      setRiskInterest(null)
+      setHavePaidApp(null)
+      setWhichApp('')
+      setThinkAboutPayApp(null)
+      setKnowHRV(null)
+      setHrvAppInterest(null)
+      setPayHrvAppInterest(null)
+      setWhyHrvAppInterest('')
+      setWhyPayHrvAppInterest('')
+
+      setEmailError(false)
+      setEmailExists(false)
+      setPhoneError(false)
+      setDateError(false)
+    } catch (error) {
+      console.error('Firestore error: ', error)
+    }
+  }
 
   const steps = [
     {
@@ -160,7 +246,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       description: (
         <Grid container spacing="20px" marginTop="10px" justifyContent={"center"}>
           <Grid item xs={12} md={5}><TextField id="name" value={name} onChange={(e)=>setName(e.target.value)} label={translations.Name} variant="outlined" sx={{ width:"100%" }} /></Grid>
-          <Grid item xs={12} md={7}><TextField id="email" value={email} onChange={(e)=>setEmail(e.target.value)} error={emailError && email!=''} label={translations.Email} variant="outlined" sx={{ width:"100%" }} /></Grid>
+          <Grid item xs={12} md={7}><TextField id="email" value={email} onChange={(e)=>setEmail(e.target.value)} error={emailError && email!=''} label={translations.Email} helperText={emailExists ? "Email already exists" : ""} variant="outlined" sx={{ width:"100%" }} /></Grid>
           <Grid item xs={12} md={4}><TextField id="phone" value={phone} onChange={(e)=>setPhone(e.target.value)} error={phoneError && phone!=''} label={translations.Phone} variant="outlined" sx={{ width:"100%" }} /></Grid>
           <Grid item xs={12} md={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -173,7 +259,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
             />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={4}>
             <FormControl sx={{ width:"100%" }}>
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
@@ -182,9 +268,25 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 sx={{ display: "flex", flexDirection: "row", justifyContent: "center" }}
                 onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
               >
-                <FormControlLabel value="female" control={<Radio />} label={translations.Female} />
-                <FormControlLabel value="male" control={<Radio />} label={translations.Male} />
-                <FormControlLabel value="other" control={<Radio />} label={translations.Other} />
+                <FormControlLabel value="female" 
+                  componentsProps={{
+                    typography: {
+                      style: { fontSize: '12px', margin: 0 }
+                    }
+                  }} control={<Radio />} label={translations.Female} />
+                <FormControlLabel value="male" 
+                  componentsProps={{
+                    typography: {
+                      style: { fontSize: '12px', margin: 0 }
+                    }
+                  }} 
+                  control={<Radio />} label={translations.Male} />
+                <FormControlLabel value="other" 
+                  componentsProps={{
+                    typography: {
+                      style: { fontSize: '12px', margin: 0 }
+                    }
+                  }} control={<Radio />} label={translations.Other} />
               </RadioGroup>
             </FormControl>
           </Grid>
@@ -192,36 +294,38 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       ),
     },
     {
-      label: 'Entrenamiento',
+      label: translations.Training,
       description: (
         <>
           <Grid container spacing="20px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
             <Grid item xs={12} md={6}>
               <FormGroup sx={{ width: "auto" }}>
-                <FormLabel component="legend" style={{marginBottom: "10px"}}>Lo mío es más...</FormLabel>
-                <FormControlLabel control={<Checkbox value="La montaña" onChange={handleCheckboxChangeGroup1}/>} label="La montaña" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="El asfalto" onChange={handleCheckboxChangeGroup1}/>} label="El asfalto" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="Sólo corro" onChange={handleCheckboxChangeGroup1}/>} label="Sólo corro para estar en forma o perder peso" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="Ciclismo" onChange={handleCheckboxChangeGroup1}/>} label="Ciclismo" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="Triatlón" onChange={handleCheckboxChangeGroup1}/>} label="Triatlón" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormLabel component="legend" style={{marginBottom: "10px"}}>{translations.habitsTitle}</FormLabel>
+                <FormControlLabel control={<Checkbox value="mountain" checked={selectedOptionsGroup1.includes("mountain")} onChange={handleCheckboxChangeGroup1}/>} label={translations.trailRunning} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="road" checked={selectedOptionsGroup1.includes("road")} onChange={handleCheckboxChangeGroup1}/>} label={translations.roadRunning} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="health" checked={selectedOptionsGroup1.includes("health")} onChange={handleCheckboxChangeGroup1}/>} label={translations.beFit} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="cycling" checked={selectedOptionsGroup1.includes("cycling")} onChange={handleCheckboxChangeGroup1}/>} label={translations.cycling} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="triathlon" checked={selectedOptionsGroup1.includes("triathlon")} onChange={handleCheckboxChangeGroup1}/>} label={translations.triathlon} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
               </FormGroup>
             </Grid>
             <Grid item xs={12} md={6}>
               <FormGroup sx={{ width: "auto" }}>
-                <FormLabel component="legend">¿Has hecho alguna vez una planificación de tu entrenamiento? (puedes seleccionar varias opciones y/o escribir otra respuesta)</FormLabel>
-                <FormControlLabel control={<Checkbox value="Sí, por mi cuenta." onChange={handleCheckboxChangeGroup2} />} label="Sí, por mi cuenta." sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="Sí, con entrenador/a personal" onChange={handleCheckboxChangeGroup2} />} label="Sí, con entrenador/a personal" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="No por escrito pero sí tengo en cuenta lo que hago (entreno por sensaciones)" onChange={handleCheckboxChangeGroup2} />} label="No por escrito pero sí tengo en cuenta lo que hago (entreno por sensaciones)" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
-                <FormControlLabel control={<Checkbox value="No planifico, voy improvisando según lo que me apetece" onChange={handleCheckboxChangeGroup2} />} label="No planifico, voy improvisando según lo que me apetece" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormLabel component="legend" style={{marginBottom: "10px"}}>{translations.havePlanTraining}</FormLabel>
+                <FormControlLabel control={<Checkbox value="my_own" checked={selectedOptionsGroup2.includes("my_own")} onChange={handleCheckboxChangeGroup2} />} label={translations.yesMyself} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="personal_trainer" checked={selectedOptionsGroup2.includes("personal_trainer")} onChange={handleCheckboxChangeGroup2} />} label={translations.yesCoach} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="club_trainer" checked={selectedOptionsGroup2.includes("club_trainer")} onChange={handleCheckboxChangeGroup2} />} label={translations.yesClub} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="digital_trainer" checked={selectedOptionsGroup2.includes("digital_trainer")} onChange={handleCheckboxChangeGroup2} />} label={translations.yesDigital} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="feelings" checked={selectedOptionsGroup2.includes("feelings")} onChange={handleCheckboxChangeGroup2} />} label={translations.noFeelings} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
+                <FormControlLabel control={<Checkbox value="no_planning" checked={selectedOptionsGroup2.includes("no_planning")} onChange={handleCheckboxChangeGroup2} />} label={translations.noPlanning} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}/>
                 <FormControlLabel
                   control={<Checkbox checked={showOtherOption} onChange={handleOtherOptionChange} />}
-                  label="Otra opción" sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}
+                  label={translations.otherOption} sx={{ '& .MuiFormControlLabel-label': { marginBottom: 0 } }}
                 />
                 {showOtherOption && (
                   <TextField
                     value={otherOptionText}
                     onChange={(e) => setOtherOptionText(e.target.value)}
-                    label="Otra opción"
+                    label={translations.otherOption}
                     variant="outlined"
                     sx={{ marginTop: 2 }}
                   />
@@ -239,16 +343,16 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 '& .MuiInputLabel-root': {
                   whiteSpace: 'normal',
                   wordWrap: 'break-word',
-                  marginBottom: '8px', // Afegeix un marge inferior per separar el label del TextField
-                },
+                  marginBottom: '8px',                 },
                 '@media (max-width:1024px)': {
                   '& .MuiInputLabel-root': {
                     position: 'relative',
                     transform: 'none',
                   },
                 },
+                marginBottom: 2
               }}
-              label="¿Has encontrado algún problema o dificultad en cuanto a planificación-resultados? ¿Le has buscado solución? ¿Cuál?"
+              label={translations.foundProblems}
               InputLabelProps={{
                 sx: {
                   whiteSpace: 'normal',
@@ -262,12 +366,12 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       )
     },
     {
-      label: 'Intereses',
+      label: translations.Interests,
       description: (
         <>
           <Grid container spacing="20px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
             <Grid item xs={12} md={6}>
-              <Typography component="legend">¿Cuánto interés tienes en mejorar tu rendimiento?</Typography>
+              <Typography component="legend">{translations.performanceInterest}</Typography>
               <Grid container direction={"row"} gap={2}>
                 <Rating
                   name="performanceInterest"
@@ -278,12 +382,29 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   onChangeActive={(_event, newHover) => {
                     setPerformanceInterest_Hover(newHover);
                   }}
+                  icon={<RadioButtonCheckedIcon fontSize="inherit" />}
+                  emptyIcon={<RadioButtonUncheckedIcon fontSize="inherit" />}
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: theme.palette.primary.main,
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: theme.palette.primary.main,
+                    },
+                    marginBottom: 2
+                  }}
                 />
-                {performanceInterest !== null && (
-                  <Typography>{interest_Labels[performanceInterest_Hover !== -1 ? performanceInterest_Hover : performanceInterest]}</Typography>
-                )}
+                <Typography>
+                  {
+                    performanceInterest_Hover !== null && performanceInterest_Hover !== -1 ? 
+                      interest_Labels[performanceInterest_Hover]
+                    : performanceInterest !== null ? 
+                      interest_Labels[performanceInterest]
+                    : ""
+                  }
+              </Typography>
               </Grid>
-              <Typography component="legend">¿Cuánto te preocupa un posible riesgo cardíaco mientras corres?</Typography>
+              <Typography component="legend">{translations.riskInterest}</Typography>
               <Grid container direction={"row"} gap={2}>
                 <Rating
                   name="performanceInterest"
@@ -294,15 +415,32 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   onChangeActive={(_event, newHover) => {
                     setRiskInterest_Hover(newHover);
                   }}
+                  
+                  icon={<RadioButtonCheckedIcon fontSize="inherit" />}
+                  emptyIcon={<RadioButtonUncheckedIcon fontSize="inherit" />}
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: theme.palette.primary.main,
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: theme.palette.primary.main,
+                    },
+                  }}
                 />
-                {riskInterest !== null && (
-                  <Typography>{interest_Labels[riskInterest_Hover !== -1 ? riskInterest_Hover : riskInterest]}</Typography>
-                )}
+                <Typography>
+                  {
+                    riskInterest_Hover !== null && riskInterest_Hover !== -1 ? 
+                      interest_Labels[riskInterest_Hover]
+                    : riskInterest !== null ? 
+                      interest_Labels[riskInterest]
+                    : ""
+                  }
+                </Typography>
               </Grid>
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <Typography component="legend">¿Pagas o has pagado alguna vez la suscripción premium de alguna app deportiva?</Typography>
+              <Typography component="legend">{translations.payForApp}</Typography>
               <RadioGroup
                 name="havePaidApp"
                 value={havePaidApp}
@@ -310,21 +448,21 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   setHavePaidApp(event.target.value as "yes" | "no");
                 }}
               >
-                <FormControlLabel value="yes" control={<Radio />} label="Sí" />
+                <FormControlLabel value="yes" control={<Radio />} label={translations.yes} />
                 <FormControlLabel value="no" control={<Radio />} label="No" />
               </RadioGroup>
               {havePaidApp === "no" && (
                 <>
-                  <Typography component="legend">¿Te lo has planteado?</Typography>
+                  <Typography component="legend">{translations.considerPayApp}</Typography>
                   <RadioGroup
                     name="thinkAboutPayApp"
                     value={thinkAboutPayApp}
                     onChange={(event) => {
                       setThinkAboutPayApp(event.target.value as "yes" | "no");
                     }}
-                    >
-                    <FormControlLabel value="yes" control={<Radio />} label="Sí" />
-                    <FormControlLabel value="no" control={<Radio />} label="No" />
+                  >
+                    <FormControlLabel value="yes" control={<Radio />} label={translations.yes} />
+                    <FormControlLabel value="no" control={<Radio />} label={translations.no} />
                   </RadioGroup>
                 </>
               )}
@@ -332,7 +470,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 <TextField
                   value={whichApp}
                   onChange={(e) => setWhichApp(e.target.value)}
-                  label="¿Cuál?"
+                  label={translations.whichOne}
                   variant="outlined"
                   sx={{ marginTop: 2, width: "100%" }}
                 />
@@ -377,10 +515,27 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   onChangeActive={(_event, newHover) => {
                     setHrvAppInterest_Hover(newHover);
                   }}
+                  icon={<RadioButtonCheckedIcon fontSize="inherit" />}
+                  emptyIcon={<RadioButtonUncheckedIcon fontSize="inherit" />}
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: theme.palette.primary.main,
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: theme.palette.primary.main,
+                    },
+                    marginBottom: "1rem"
+                  }}
                 />
-                {hrvAppInterest !== null && (
-                  <Typography>{interest_Labels[hrvAppInterest_Hover !== -1 ? hrvAppInterest_Hover : hrvAppInterest]}</Typography>
-                )}
+                <Typography>
+                  {
+                    hrvAppInterest_Hover !== null && hrvAppInterest_Hover !== -1 ? 
+                      interest_Labels[hrvAppInterest_Hover]
+                    : hrvAppInterest !== null ? 
+                      interest_Labels[hrvAppInterest]
+                    : ""
+                  }
+                </Typography>
               </Grid>
               {hrvAppInterest != null && (
                 <TextField
@@ -403,10 +558,28 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   onChangeActive={(_event, newHover) => {
                     setPayHrvAppInterest_Hover(newHover);
                   }}
+                  
+                  icon={<RadioButtonCheckedIcon fontSize="inherit" />}
+                  emptyIcon={<RadioButtonUncheckedIcon fontSize="inherit" />}
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: theme.palette.primary.main,
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: theme.palette.primary.main,
+                    },
+                    marginBottom: "1rem"
+                  }}
                 />
-                {payHrvAppInterest !== null && (
-                  <Typography>{interest_Labels[payHrvAppInterest_Hover !== -1 ? payHrvAppInterest_Hover : payHrvAppInterest]}</Typography>
-                )}
+                  <Typography>
+                    {
+                      payHrvAppInterest_Hover !== null && payHrvAppInterest_Hover !== -1 ? 
+                        interest_Labels[payHrvAppInterest_Hover]
+                      : payHrvAppInterest !== null ? 
+                        interest_Labels[payHrvAppInterest]
+                      : ""
+                    }
+                  </Typography>
               </Grid>
               {payHrvAppInterest != null && (
                 <TextField
@@ -431,32 +604,6 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
     }
   ]
 
-  const handleSubmit  =  async (event: React.MouseEvent<HTMLButtonElement>)  => {
-    event.preventDefault()
-
-    try {
-      await addDoc(collection(db, 'surveys'), {
-        name,
-        email,
-        phone,
-        birthday,
-        gender,
-        timestamp: serverTimestamp()
-      })
-      handleNext()
-      setName('')
-      setEmail('')
-      setPhone('')
-      setBirthday(null)
-      setGender(null)
-      setEmailError(false)
-      setPhoneError(false)
-      setDateError(false)
-    } catch (error) {
-      console.error('Firestore error: ', error)
-    }
-  }
-
   return (
       <Card sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
         <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
@@ -480,7 +627,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                     <Button
                       variant="contained"
                       onClick={index === steps.length - 1 ? handleSubmit : handleNext}
-                      disabled={activeStep === 0 ? isStep1Invalid() : activeStep === 1 ? isStep2Invalid() : false} 
+                      disabled={isStepInvalid(activeStep)} 
                       sx={{ mt: 3, mr: 1 }}
                     >
                       {index === steps.length - 1 ? translations.Send : translations.Continue}
@@ -498,8 +645,9 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
             ))}
           </Stepper>
           {activeStep === steps.length && (
-            <Paper square elevation={0} sx={{ p: 3 }}>
-              <Typography>All steps completed - you&apos;re finished</Typography>
+            <Paper square elevation={3} sx={{ p: 3, backgroundColor: cardBackground, borderRadius: "15px" }}>
+              <Typography>¡Muchas gracias!</Typography>
+              <Typography>🙂</Typography>
               <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
                 Reset
               </Button>
