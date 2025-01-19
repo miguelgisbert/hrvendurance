@@ -1,4 +1,3 @@
-import { yearCalendarClasses } from "@mui/x-date-pickers/YearCalendar/yearCalendarClasses";
 import { Translations } from "./types";
 
 const translations: Translations = {

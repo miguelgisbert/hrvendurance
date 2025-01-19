@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState, FC} from 'react'
-import { Grid, Box, Typography, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
+import { Grid, Box, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
 import {LanguageSwitch} from './languageSwitch'
 import {ThemeModeSwitch} from './themeModeSwitch'
 import logoPart1 from '../assets/logoPart1.svg'
@@ -14,7 +14,7 @@ interface HeaderProps {
   toggleThemeMode: () => void;
 }
 
-const Header: FC<HeaderProps> = ({setLanguage, theme, translations, language, themeMode, toggleThemeMode}) => {
+const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode}) => {
 
     const en = useRef<HTMLButtonElement>(null)
     const es = useRef<HTMLButtonElement>(null)

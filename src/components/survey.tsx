@@ -9,7 +9,6 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
-import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions'
 
 const firebaseConfig  =  {
   apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
