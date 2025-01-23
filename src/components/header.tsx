@@ -71,9 +71,10 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggl
       }, [])
 
     return (
-        <Grid container component="header" zIndex="1000" height="120px" padding="20px 50px" position="fixed" sx={{ background: (theme: Theme) => theme.myBackground.header }}>
-            <Grid container item xs={12} md={6} alignItems="center" justifyContent="start">
-                <Box component="img" src={logoPart2} ref={group2Ref} 
+        <Grid container component="header" zIndex="1000" height="120px" padding={window.innerWidth > 650 ? "20px 50px" : window.innerWidth < 365 ? "20px 0 20px 20px" : "20px"} position={window.innerWidth > 650 ? "fixed" : "relative"} sx={{ background: (theme: Theme) => theme.myBackground.header }}>
+            <Grid container item xs={5} md={6} alignItems="center" justifyContent="start">
+                {window.innerWidth > 650 && (
+                  <Box component="img" src={logoPart2} ref={group2Ref} 
                   sx={{ 
                     width: window.innerWidth >= 1000 ? "235px" : 235/1.7,
                     position:"fixed",
@@ -81,20 +82,21 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggl
                     top: window.innerWidth < 1000 ? 25 : "calc(50% + 100px)",
                     left: window.innerWidth < 1000 ? 190 : "20%"
                   }} />
+                )}
                 <Box component="img" src={logoPart1} ref={group1Ref} 
                   sx={{ 
                     width: window.innerWidth >= 1000 ? "235px" : 235/2,
-                    position:"fixed",
+                    position: window.innerWidth > 650 ? "fixed" : "relative",
                     zIndex:"10",
-                    top: window.innerWidth < 1000 ? 16 : "calc(50% + 100px)",
-                    left: window.innerWidth < 1000 ? 50 : "20%",
+                    top: window.innerWidth < 1000 ? window.innerWidth < 650 ? 0 : 16 : "calc(50% + 100px)",
+                    left: window.innerWidth < 1000 ? window.innerWidth < 650 ? 0 : 50 : "20%",
                     transform: window.innerWidth >= 1000 ? "translate(0, calc(-100% - 14px))" : ""
                   }} />
-                {theme.palette.mode !== "dark" && (
+                {theme.palette.mode !== "dark" && window.innerWidth >= 1000 && (
                 <Card sx={{ opacity: mainLogoBGopacity, width:"350px", height:"350px", position:"fixed", top: "calc(50% + 100px)", left: "20%", zIndex: 1, transform: "translate(-18%, -58%)", backgroundColor: theme => theme.palette.secondary.main}}></Card>
                 )}
             </Grid>
-            <Grid container item xs={12} md={6} >
+            <Grid container item xs={7} md={6} >
               <Grid container item xs={12} alignItems="end" justifyContent="end">
                 <ThemeModeSwitch
                   checked={themeMode === 'dark'}

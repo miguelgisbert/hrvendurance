@@ -486,7 +486,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
           <Grid container spacing="80px" marginTop="10px" justifyContent={"center"} textAlign={"start"} alignContent={"start"}>
             <Grid item xs={12} md={6} display={"flex"} flexDirection={"column"} gap={2}>
 
-              <Typography component="legend">¿Has oído hablar de la Variabilidad de Frecuencia Cardíaca? (HRV en inglés)</Typography>
+              <Typography component="legend">{translations.heardAboutHRV}</Typography>
               <RadioGroup
                 name="knowHRV"
                 value={knowHRV}
@@ -494,17 +494,17 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                   setKnowHRV(event.target.value as "yes" | "no");
                 }}
                 >
-                <FormControlLabel value="yes" control={<Radio />} label="Sí" />
-                <FormControlLabel value="no" control={<Radio />} label="No" />
+                <FormControlLabel value="yes" control={<Radio />} label={translations.yes} />
+                <FormControlLabel value="no" control={<Radio />} label={translations.no} />
               </RadioGroup>
 
               <Grid item xs={12} sx={{display: {xs:'block', md:'none'}}}>
-                <Typography component="legend">Te explico brevemente qué es y cómo puede ayudar en un entrenamiento de resistencia en este vídeo de 1 minuto y medio.</Typography>
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+                <Typography component="legend">{translations.HRVexplanation}</Typography>
+                <iframe width="560" style={{maxWidth: "100%"}} height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
               </Grid>
               
               <Grid container direction={"row"} gap={2}>
-                <Typography component="legend">Después de ver el vídeo, ¿cuánto interés tendrías en una app para llevar un registro de tu VFC y que te sugiera tu entrenamiento diariamente según tu VFC obteniendo así las ventajas mencionadas en el vídeo?</Typography>
+                <Typography component="legend">{translations.HRVappInterest}</Typography>
                 <Rating
                   name="hrvAppInterest"
                   value={hrvAppInterest}
@@ -540,14 +540,14 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 <TextField
                   value={whyHrvAppInterest}
                   onChange={(e) => setWhyHrvAppInterest(e.target.value)}
-                  label="¿Por qué?"
+                  label={translations.why}
                   variant="outlined"
                   sx={{ marginBottom: 2, width: "100%" }}
                 />
               )}
 
               <Grid container direction={"row"} gap={2}>
-                <Typography component="legend">¿Cuánta disposición tendrías a pagar una  suscripción premium por esta app? (no podemos saber cuál sería el precio todavía pero orientativamente podría estar en 5 € / mes o 50 € / año)</Typography>
+                <Typography component="legend">{translations.appPayingInterest}</Typography>
                 <Rating
                   name="payHrvAppInterest"
                   value={payHrvAppInterest}
@@ -584,7 +584,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 <TextField
                   value={whyPayHrvAppInterest}
                   onChange={(e) => setWhyPayHrvAppInterest(e.target.value)}
-                  label="¿Por qué?"
+                  label={translations.why}
                   variant="outlined"
                   sx={{ marginBottom: 2, width: "100%" }}
                 />
@@ -593,7 +593,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
             </Grid>
 
             <Grid item md={6} sx={{display: {xs:'none', md:'block'}}}>
-              <Typography component="legend">Te explico brevemente qué es y cómo puede ayudar en un entrenamiento de resistencia en este vídeo de 1 minuto y medio.</Typography>
+              <Typography component="legend">{translations.HRVexplanation}</Typography>
               <iframe width="560" height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
             </Grid>
 
@@ -606,18 +606,12 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   return (
       <Card sx = {{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
         <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.GetInvolved}</Typography>
-        <Typography>{translations.EnterSurvey}</Typography>
+        <Typography sx={{ textWrap: "balance", maxWidth: "400px" }}>{translations.EnterSurvey}</Typography>
         <Box component="form" noValidate>
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map((step, index) => (
               <Step key={step.label}>
-                <StepLabel
-                  optional={
-                    index === steps.length - 1 ? (
-                      <Typography variant="caption">Last step</Typography>
-                    ) : null
-                  }
-                >
+                <StepLabel>
                   {step.label}
                 </StepLabel>
                 <StepContent>

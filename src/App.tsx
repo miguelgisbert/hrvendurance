@@ -75,13 +75,14 @@ function App() {
     <ThemeProvider theme = {currentTheme}>
         <Grid container sx = {{ backgroundColor: (theme: MyTheme)  => theme.myBackground.main }}>
           <Header setLanguage = {setLanguage} theme = {currentTheme} translations = {translations} language = {language} themeMode = {themeMode as 'light' | 'dark'} toggleThemeMode = {toggleThemeMode} />
-          <Grid container height = "calc(100vh - 120px)" marginTop = "120px" alignItems = "center" justifyContent = "center" padding = "30px">
+          <Grid container height = "calc(100vh - 120px)" marginTop = {window.innerWidth < 650 ? "none" : "120px"} alignItems = "center" justifyContent = "center" padding = "30px">
 
             {/* Void space for the logo */}
-            <Grid container item xs = {12} md = {6} alignItems = "center" justifyContent = "center"></Grid>
-
+            {window.innerWidth > 1000 && (
+              <Grid container item xs = {12} md = {6} alignItems = "center" justifyContent = "center"></Grid>
+            )}
             {/* Flipping over card */}
-            <Grid container item xs = {12} md = {6} alignItems = "center" justifyContent = "center" sx = {{ color: 'red', paddingRight: "10%" }}>
+            <Grid container item xs = {12} md = {window.innerWidth > 1000 ? 6 : false} alignItems = "center" justifyContent = "center" sx = {{ color: 'red', paddingRight: window.innerWidth < 1000 ? "none" : "10%" }}>
               <ReactCardFlip isFlipped = {isFlipped} flipDirection = "horizontal">
                 <Card onMouseOver = {()  => setIsFlipped(true)} sx = {{ width:"300px", height:"300px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"start", textAlign:"center", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
                     <Box ref = {titleBoxRef} sx = {{ height:"100px", width:"100%", position: 'relative', left: 20 }} >
@@ -111,26 +112,26 @@ function App() {
             </Grid>
           </Grid>
 
-          <Grid container alignItems = "center" justifyContent = "center" padding = "70px 20px 130px">
+          <Grid container alignItems = "center" justifyContent = {window.innerWidth < 950 ? "flex-start" : "center"} padding = "70px 20px 130px" sx={{ overflowX: "auto" }}>
             <TrainingTable translations = {translations} />
           </Grid>
 
           <Grid container alignItems = "stretch" justifyContent = "center" padding = "30px" marginBottom = "100px" spacing = {"30px"} sx = {{ color: theme  => theme.palette.primary.main }}>
-            <Grid item xs = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
+            <Grid item xs = {12} md = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
               <Card sx = {{ flex:1, maxWidth:"300px", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
                 <img src = {heart1} height = "70px" style = {{ display: "flex", flexDirection: "column", width: "100%", marginBottom: "20px" }} />
                 <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.Measure}</Typography>
                 <Typography>{translations.MeasureParagraph}</Typography>
               </Card>
             </Grid>
-            <Grid item xs = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
+            <Grid item xs = {12} md = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
               <Card sx = {{ flex:1, maxWidth:"300px", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
                   <img src = {runners} height = "70px" style = {{ display: "flex", flexDirection: "column", width: "100%", marginBottom: "20px" }} />
                   <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.Train}</Typography>
                 <Typography>{translations.TrainParagraph}</Typography>
               </Card> 
             </Grid>
-            <Grid item xs = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
+            <Grid item xs = {12} md = {4} maxWidth = "350px!important" sx = {{ display:"flex" }}>
               <Card sx = {{ flex:1, maxWidth:"300px", borderRadius:"20px", padding:"30px 20px", boxShadow:`10px 10px ${shadowColor}`, backgroundColor: cardBackground }}>
                 <img src = {improve} height = "70px" style = {{ display: "flex", flexDirection: "column", width: "100%", marginBottom: "20px" }} />
                 <Typography component = "h1" sx = {{ marginBottom:1, fontWeight:600, fontSize:22 }}>{translations.Improve}</Typography>
