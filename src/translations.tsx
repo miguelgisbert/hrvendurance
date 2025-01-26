@@ -73,6 +73,7 @@ const translations: Translations = {
       HRVappInterest: "After watching the video, how interested would you be in an app to track your HRV and suggest your daily training based on your HRV, thus obtaining the benefits mentioned?",
       appPayingInterest: "How interested would you be in paying a premium subscription for this app? (we cannot know the price yet but it could be around 5 € / month or 50 € / year)",
       why: "Why?",
+      mustBe18: "You must be 18 years old or older.",
     },
 
     es: {
@@ -147,6 +148,7 @@ const translations: Translations = {
       HRVappInterest: "Después de ver el vídeo, ¿cuánto interés tendrías en una app para llevar un registro de tu VFC y que te sugiera tu entrenamiento diariamente según tu VFC obteniendo así las ventajas mencionadas en el vídeo?",
       appPayingInterest: "¿Cuánta disposición tendrías a pagar una  suscripción premium por esta app? (no podemos saber cuál sería el precio todavía pero orientativamente podría estar en 5 € / mes o 50 € / año)",
       why: "¿Por qué?",
+      mustBe18: "Sólo para mayores de 18 años.",
     },
 
     ca: {
@@ -221,6 +223,7 @@ const translations: Translations = {
       HRVappInterest: "Després de veure el vídeo, quin interès tindries en una app per portar un registre de la teva VFC i que et suggerisca el teu entrenament diàriament segons la teva VFC obtenint així les avantatges esmentades?",
       appPayingInterest: "Quina disposició tindries a pagar una subscripció premium per aquesta app? (no podem saber quin seria el preu encara però orientativament podria estar en 5 € / mes o 50 € / any)",
       why: "Per què?",
+      mustBe18: "Has de ser major de 18 anys.",
     }
 };
 

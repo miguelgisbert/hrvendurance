@@ -3,7 +3,7 @@ import { Button, Box, Card, Theme, Typography, Stepper, Step, StepLabel, StepCon
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import dayjs from 'dayjs';
+import dayjs, {Dayjs} from 'dayjs';
 import { Translations, Language } from '../types'
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
@@ -96,6 +96,7 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   const [emailExists, setEmailExists] = useState<boolean>(false)
   const [phoneError, setPhoneError] = useState<boolean>(false)
   const [dateError, setDateError] = useState(false)
+  const [dateErrorMessage, setDateErrorMessage] = useState('');
 
   const validateEmail = async (value: string) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -142,6 +143,28 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
   useEffect(()=>{
     validatePhone(phone)
   },[phone])
+
+  const handleDateChange = (newValue: Dayjs | null) => {
+    if (newValue) {
+      const today = dayjs();
+      const birthDate = dayjs(newValue);
+      const age = today.diff(birthDate, 'year');
+
+      if (age < 18) {
+        setDateError(true);
+        setDateErrorMessage(translations.mustBe18);
+      } else {
+        setDateError(false);
+        setDateErrorMessage('');
+      }
+
+      setBirthday(newValue.toDate());
+    } else {
+      setBirthday(null);
+      setDateError(false);
+      setDateErrorMessage('');
+    }
+  };
 
   const isStepInvalid = (step: number): boolean => {
     switch (step) {
@@ -251,10 +274,15 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label={translations.Birthday}
-              sx={{ width: "100%" }}
               value={birthday ? dayjs(birthday) : null}
-              onChange={(newValue) => setBirthday(newValue ? newValue.toDate() : null)}
-              onError={(error) => setDateError(!!error)}
+              onChange={handleDateChange}
+              slotProps={{
+                textField: {
+                  error: dateError,
+                  helperText: dateError ? dateErrorMessage : '',
+                  sx: { width: "100%" }
+                }
+              }}
             />
             </LocalizationProvider>
           </Grid>
@@ -498,9 +526,20 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
                 <FormControlLabel value="no" control={<Radio />} label={translations.no} />
               </RadioGroup>
 
+              {/* Video for mobile view */}
               <Grid item xs={12} sx={{display: {xs:'block', md:'none'}}}>
                 <Typography component="legend">{translations.HRVexplanation}</Typography>
-                <iframe width="560" style={{maxWidth: "100%"}} height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+                <iframe 
+                  src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16 / 9', 
+                    maxWidth: '560px',
+                    maxHeight: '315px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }} 
+                ></iframe>
               </Grid>
               
               <Grid container direction={"row"} gap={2}>
@@ -594,9 +633,18 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
 
             <Grid item md={6} sx={{display: {xs:'none', md:'block'}}}>
               <Typography component="legend">{translations.HRVexplanation}</Typography>
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+              <iframe  
+                  src="https://www.youtube.com/embed/5_hMPLcfIy0?si=lOvv-YG5P9cd9zWJ" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16 / 9', 
+                    maxWidth: '560px',
+                    maxHeight: '315px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }} 
+                ></iframe>
             </Grid>
-
           </Grid>
         </>
       )
