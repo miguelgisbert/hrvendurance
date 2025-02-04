@@ -5,23 +5,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import dayjs, {Dayjs} from 'dayjs';
 import { Translations, Language } from '../types'
-import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
-
-const firebaseConfig  =  {
-  apiKey: "AIzaSyCRJA0l7MlxyBo8-NMBerGFyDDKBO9dEss",
-  authDomain: "hrv-endurance-landing.firebaseapp.com",
-  projectId: "hrv-endurance-landing",
-  storageBucket: "hrv-endurance-landing.appspot.com",
-  messagingSenderId: "228357777566",
-  appId: "1:228357777566:web:9120c54e80fecf3ce3b38f",
-  measurementId: "G-80B1PFKXX5"
-}
-
-const app  =  initializeApp(firebaseConfig)
-const db  =  getFirestore(app)
+import { db } from '../firebaseConfig'
 
 interface SurveyProps {
   theme: Theme
@@ -104,14 +91,20 @@ const Survey: FC<SurveyProps>  =  ({ theme, translations })  => {
       setEmailError(true)
       setEmailExists(false)
     } else {
-      // Check if email already exists
-      const q = query(collection(db, 'surveys'), where('email', '==', value))
-      const querySnapshot = await getDocs(q)
-      if (!querySnapshot.empty) {
+      try {
+        // Check if email already exists
+        const q = query(collection(db, 'surveys'), where('email', '==', value))
+        const querySnapshot = await getDocs(q)
+        if (!querySnapshot.empty) {
+          setEmailError(true)
+          setEmailExists(true)
+        } else {
+          setEmailError(false)
+          setEmailExists(false)
+        }
+      } catch (error) {
+        console.error("Error checking email existence: ", error)
         setEmailError(true)
-        setEmailExists(true)
-      } else {
-        setEmailError(false)
         setEmailExists(false)
       }
     }

@@ -1,4 +1,11 @@
 import '@mui/material/styles';
+import { User } from 'firebase/auth';
+
+type FormToShow = 'login' | 'signup' | 'none'
+
+export interface CustomUser extends User {
+    name?: string;
+}
 
 export type MyTheme = Theme & {
     myBackground: {

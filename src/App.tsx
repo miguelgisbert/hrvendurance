@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import { Grid, Typography, Card, Box } from '@mui/material'
 import createMyTheme from './theme'
 import { MyTheme } from './theme'
 
+import { UserContext } from './UserContext'
+import { PopperProvider } from './PopperContext'
+import { CustomUser } from './types'
 import Header from './components/header.js'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import ReactCardFlip from 'react-card-flip'
@@ -15,13 +18,24 @@ import TrainingTable from './components/trainingTable'
 import Survey from './components/survey.js'
 
 function App() {
+  
+  const { user, loading } = useContext(UserContext) as { user: CustomUser, loading: boolean }
+  useEffect(() => {
+    console.log("App user: ", user)
+  }, [user])
+  // if (loading) {
+  //   return <div>Loading...</div>; // Or some other loading indicator
+  // }
+
   const browserLang  =  navigator.language
   const prefersDarkMode  =  useMediaQuery('(prefers-color-scheme: dark)')
   
   const [language, setLanguage]    =  useState<string>(browserLang ? browserLang : 'en')
   const [themeMode, setThemeMode]  =  useState<"dark" | "light">(prefersDarkMode ? 'dark' : 'light')
   const [isFlipped, setIsFlipped]  =  useState<boolean>(false)
-
+  
+  const [showPopper] = useState<boolean>(false)
+  
   
   const { theme: currentTheme, translations }  =  useMemo(()  => {
     return createMyTheme(language, themeMode);
@@ -72,9 +86,9 @@ function App() {
   }, []);  
   
   return (
-    <ThemeProvider theme = {currentTheme}>
+    <ThemeProvider theme = {currentTheme}><PopperProvider>
         <Grid container sx = {{ backgroundColor: (theme: MyTheme)  => theme.myBackground.main }}>
-          <Header setLanguage = {setLanguage} theme = {currentTheme} translations = {translations} language = {language} themeMode = {themeMode as 'light' | 'dark'} toggleThemeMode = {toggleThemeMode} />
+          <Header setLanguage = {setLanguage} theme = {currentTheme} translations = {translations} language = {language} themeMode = {themeMode as 'light' | 'dark'} toggleThemeMode = {toggleThemeMode} showPopper={showPopper} />
           <Grid container height = "calc(100vh - 120px)" marginTop = {window.innerWidth < 650 ? "none" : "120px"} alignItems = "center" justifyContent = "center" padding = "30px">
 
             {/* Void space for the logo */}
@@ -145,7 +159,7 @@ function App() {
           </Grid>
           
         </Grid>    
-    </ThemeProvider>
+      </PopperProvider></ThemeProvider>
   )
 }
 
