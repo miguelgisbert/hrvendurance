@@ -2,7 +2,7 @@ import React, {useRef, useEffect, useState, FC} from 'react'
 import { Grid, Box, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
 import {LanguageSwitch} from './languageSwitch'
 import {ThemeModeSwitch} from './themeModeSwitch'
-import { Login } from './login'
+// import { Login } from './login'
 import logoPart1 from '../assets/logoPart1.svg'
 import logoPart2 from '../assets/logoPart2.svg'
 
@@ -16,7 +16,7 @@ interface HeaderProps {
   showPopper: boolean;
 }
 
-const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode, showPopper}) => {
+const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode, /*showPopper*/}) => {
 
     const en = useRef<HTMLButtonElement>(null)
     const es = useRef<HTMLButtonElement>(null)
