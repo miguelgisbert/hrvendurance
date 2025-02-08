@@ -1,7 +1,8 @@
 import React, {useRef, useEffect, useState, FC} from 'react'
-import { Grid, Box, Typography, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
+import { Grid, Box, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
 import {LanguageSwitch} from './languageSwitch'
 import {ThemeModeSwitch} from './themeModeSwitch'
+// import { Login } from './login'
 import logoPart1 from '../assets/logoPart1.svg'
 import logoPart2 from '../assets/logoPart2.svg'
 
@@ -12,9 +13,10 @@ interface HeaderProps {
   language: string;
   themeMode: string;
   toggleThemeMode: () => void;
+  showPopper: boolean;
 }
 
-const Header: FC<HeaderProps> = ({setLanguage, theme, translations, language, themeMode, toggleThemeMode}) => {
+const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode, /*showPopper*/}) => {
 
     const en = useRef<HTMLButtonElement>(null)
     const es = useRef<HTMLButtonElement>(null)
@@ -30,6 +32,7 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, translations, language, th
     
     const group1Ref = useRef<HTMLImageElement>(null)
     const group2Ref = useRef<HTMLImageElement>(null)
+    
     useEffect(() => {
         const handleScroll = () => {  
           const scrollY = window.scrollY
@@ -63,23 +66,39 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, translations, language, th
           }
           setMainLogoBGopacity(BGopacity)
         }
-        window.addEventListener('scroll', handleScroll)
+        if ( window.innerWidth >= 1000 ) {
+          window.addEventListener('scroll', handleScroll)
+        }
         return () => window.removeEventListener('scroll', handleScroll)
       }, [])
 
     return (
-        <Grid container component="header" zIndex="1000" height="120px" padding="20px 50px" position="fixed" sx={{ background: (theme: Theme) => theme.myBackground.header }}>
-            <Grid container item xs={12} md={4} alignItems="center" justifyContent="start">
-                <Box component="img" src={logoPart2} ref={group2Ref} sx={{ width:"235px", position:"fixed", zIndex:"10", top:"calc(50% + 100px)", left:"20%" }} />
-                <Box component="img" src={logoPart1} ref={group1Ref} sx={{ width:"235px", position:"fixed", zIndex:"10", top:"calc(50% + 100px)", left:"20%", transform: "translate(0, calc(-100% - 14px))" }} />
-                {theme.palette.mode !== "dark" && (
-                  <Card sx={{ opacity: mainLogoBGopacity, width:"350px", height:"350px", position:"fixed", top: "calc(50% + 100px)", left: "20%", zIndex: 1, transform: "translate(-18%, -58%)", backgroundColor: theme => theme.palette.secondary.main}}></Card>
+        <Grid container component="header" zIndex="1000" height="120px" padding={window.innerWidth > 650 ? "20px 50px" : window.innerWidth < 365 ? "20px 0 20px 20px" : "20px"} position={window.innerWidth > 650 ? "fixed" : "relative"} sx={{ background: (theme: Theme) => theme.myBackground.header }}>
+            <Grid container item xs={5} md={6} alignItems="center" justifyContent="start">
+                {window.innerWidth > 650 && (
+                  <Box component="img" src={logoPart2} ref={group2Ref} 
+                  sx={{ 
+                    width: window.innerWidth >= 1000 ? "235px" : 235/1.7,
+                    position:"fixed",
+                    zIndex:"10",
+                    top: window.innerWidth < 1000 ? 25 : "calc(50% + 100px)",
+                    left: window.innerWidth < 1000 ? 190 : "20%"
+                  }} />
+                )}
+                <Box component="img" src={logoPart1} ref={group1Ref} 
+                  sx={{ 
+                    width: window.innerWidth >= 1000 ? "235px" : 235/2,
+                    position: window.innerWidth > 650 ? "fixed" : "relative",
+                    zIndex:"10",
+                    top: window.innerWidth < 1000 ? window.innerWidth < 650 ? 0 : 16 : "calc(50% + 100px)",
+                    left: window.innerWidth < 1000 ? window.innerWidth < 650 ? 0 : 50 : "20%",
+                    transform: window.innerWidth >= 1000 ? "translate(0, calc(-100% - 14px))" : ""
+                  }} />
+                {theme.palette.mode !== "dark" && window.innerWidth >= 1000 && (
+                <Card sx={{ opacity: mainLogoBGopacity, width:"350px", height:"350px", position:"fixed", top: "calc(50% + 100px)", left: "20%", zIndex: 1, transform: "translate(-18%, -58%)", backgroundColor: theme => theme.palette.secondary.main}}></Card>
                 )}
             </Grid>
-            <Grid container item xs={12} md={4} alignItems="end" justifyContent="center">
-              <Typography color={theme.palette.primary.main}>{translations.greeting}</Typography>
-            </Grid>
-            <Grid container item xs={12} md={4} >
+            <Grid container item xs={7} md={6} >
               <Grid container item xs={12} alignItems="end" justifyContent="end">
                 <ThemeModeSwitch
                   checked={themeMode === 'dark'}
@@ -104,6 +123,7 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, translations, language, th
                 </FormGroup>
               </Grid>
             </Grid>
+            {/* <Login showPopper={showPopper} /> */}
         </Grid>
     )
 }

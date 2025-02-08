@@ -1,4 +1,11 @@
 import '@mui/material/styles';
+import { User } from 'firebase/auth';
+
+type FormToShow = 'login' | 'signup' | 'none'
+
+export interface CustomUser extends User {
+    name?: string;
+}
 
 export type MyTheme = Theme & {
     myBackground: {
@@ -19,6 +26,12 @@ export type MyThemeOptions = ThemeOptions & {
 };
   
 export type Language = 'en' | 'es' | 'ca';
+
+export interface Translations {
+    [key: string]: {
+      [key: string]: string;
+    };
+}
 
 declare module '@mui/material/styles' {
     export interface Theme {

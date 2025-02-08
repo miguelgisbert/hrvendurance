@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "hrv-endurance-landing",
     "public": "dist",
     "ignore": [
       "firebase.json",
