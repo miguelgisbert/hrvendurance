@@ -11,6 +11,8 @@ import { doc, setDoc, getFirestore, getDoc } from 'firebase/firestore'
 import { UserContext } from '../UserContext'
 import { usePopper } from '../PopperContext'
 import { CustomUser } from '../types'
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import LoginIcon from '@mui/icons-material/Login';
 
 interface LoginProps {
   showPopper: boolean
@@ -18,15 +20,15 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ showPopper }) => {
 
-  const { user, setUser, /*loading,*/ setLoading } = useContext(UserContext)
+  const { user, setUser, setLoading } = useContext(UserContext)
   const { formToShow, setFormToShow } = usePopper()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const loginButtonRef = useRef(null)
-  const signUpButtonRef = useRef(null)
+  const loginButtonRef = useRef<HTMLButtonElement>(null)
+  const signUpButtonRef = useRef<HTMLButtonElement>(null)
 
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -34,6 +36,10 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
   useEffect(() => {
     console.log("USER: ",user)
   }, [user])
+
+  useEffect(() => {
+    console.log("formToShow: ",formToShow)
+  }, [formToShow])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -56,7 +62,8 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
         setErrorMessage('')
       }
       fetchUser();
-    })
+    },
+    () => {setLoading(false)})
     if (!auth.currentUser) {
       setLoading(false)
     }
@@ -80,16 +87,16 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
       console.log("User signed in successfully.")
       const user = auth.currentUser
       console.log("USER: ", user)
-      if (user) {
-        const docRef = doc(db, 'users', user.uid)
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-          const data = docSnap.data()
-          setUser({ ...user, ...data } as CustomUser)
-        } else {
-          setUser(user as CustomUser)
-        }
-      }
+      // if (user) {
+      //   const docRef = doc(db, 'users', user.uid)
+      //   const docSnap = await getDoc(docRef)
+      //   if (docSnap.exists()) {
+      //     const data = docSnap.data()
+      //     setUser({ ...user, ...data } as CustomUser)
+      //   } else {
+      //     setUser(user as CustomUser)
+      //   }
+      // }
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as FirebaseError
@@ -120,18 +127,22 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
       await setDoc(doc(db, "users", userCredential.user.uid), {
         email: email
       })
-      const user = auth.currentUser
-      console.log("USER: ", user)
-      if (user) {
-        const docRef = doc(db, 'users', user.uid)
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-          const data = docSnap.data()
-          setUser({ ...user, ...data } as CustomUser)
-        } else {
-          setUser(user as CustomUser)
-        }
-      }
+
+      await signOut(auth);
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // const user = auth.currentUser
+      // console.log("USER: ", user)
+      // if (user) {
+      //   const docRef = doc(db, 'users', user.uid)
+      //   const docSnap = await getDoc(docRef)
+      //   if (docSnap.exists()) {
+      //     const data = docSnap.data()
+      //     setUser({ ...user, ...data } as CustomUser)
+      //   } else {
+      //     setUser(user as CustomUser)
+      //   }
+      // }
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as FirebaseError
@@ -195,14 +206,14 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
               setFormToShow('login')
               setAnchorEl(e.currentTarget)
             }}>
-              Login
+              <LoginIcon />
           </Button>
           <Button ref={signUpButtonRef} color="inherit" sx={{ display: "flex", alignItems: "center", height: "100%", lineHeight: 1.3 }} 
             onClick={(e) =>{
               setFormToShow('signup')
               setAnchorEl(e.currentTarget)  
             }} >
-              Create <br /> Account
+              <PersonAddAltIcon />
           </Button>
         </Box>
       ) : (
@@ -212,8 +223,15 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
         </Box>
       )}
       <ClickAwayListener onClickAway={(event) => {
-        if (event.target !== loginButtonRef.current && event.target !== signUpButtonRef.current) {
-          setFormToShow('none')
+        if (
+          loginButtonRef.current &&
+          signUpButtonRef.current &&
+          event.target !== loginButtonRef.current &&
+          event.target !== signUpButtonRef.current &&
+          !loginButtonRef.current.contains(event.target as Node) &&
+          !signUpButtonRef.current.contains(event.target as Node)
+        ) {
+          setFormToShow('none');
         }
       }}>
         <Popper open={formToShow === 'login' || formToShow === 'signup'} anchorEl={isSmallScreen ? null : anchorEl} placement={isSmallScreen ? 'bottom' : 'bottom-end'} sx={{ boxShadow: 5, padding:"40px", width: isSmallScreen ? "70vw" : "340px", top: isSmallScreen ? '70px!important' : '20px!important', left: isSmallScreen ? '5vw!important' : 'auto', backgroundColor: theme.myBackground.cardBackground, zIndex: 1000 }}>
@@ -227,10 +245,8 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
                 }} 
                 padding={5} 
                 onSubmit={e => {
-                  console.log("test")
                   e.preventDefault()
                   if (formToShow === 'login') {
-                    console.log("signing in")
                     signIn()
                   } else if (formToShow === 'signup') {
                     signUp()

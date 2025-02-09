@@ -1,12 +1,12 @@
-import { useState, useRef, useEffect, useMemo, /*useContext*/ } from 'react'
+import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import { Grid, Typography, Card, Box } from '@mui/material'
 import createMyTheme from './theme'
 import { MyTheme } from './theme'
 
-// import { UserContext } from './UserContext'
+import { UserContext, UserProvider } from './UserContext'
 import { PopperProvider } from './PopperContext'
-// import { CustomUser } from './types'
+import { CustomUser } from './types'
 import Header from './components/header.js'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import ReactCardFlip from 'react-card-flip'
@@ -19,7 +19,7 @@ import Survey from './components/survey.js'
 
 function App() {
   
-  // const { user, loading } = useContext(UserContext) as { user: CustomUser, loading: boolean }
+  const { user } = useContext(UserContext) as { user: CustomUser, loading: boolean }
   // useEffect(() => {
   //   console.log("App user: ", user)
   // }, [user])
@@ -86,7 +86,7 @@ function App() {
   }, []);  
   
   return (
-    <ThemeProvider theme = {currentTheme}><PopperProvider>
+    <ThemeProvider theme = {currentTheme}><PopperProvider><UserProvider>
         <Grid container sx = {{ backgroundColor: (theme: MyTheme)  => theme.myBackground.main }}>
           <Header setLanguage = {setLanguage} theme = {currentTheme} translations = {translations} language = {language} themeMode = {themeMode as 'light' | 'dark'} toggleThemeMode = {toggleThemeMode} showPopper={showPopper} />
           <Grid container height = "calc(100vh - 120px)" marginTop = {window.innerWidth < 650 ? "none" : "120px"} alignItems = "center" justifyContent = "center" padding = "30px">
@@ -159,7 +159,7 @@ function App() {
           </Grid>
           
         </Grid>    
-      </PopperProvider></ThemeProvider>
+      </UserProvider></PopperProvider></ThemeProvider>
   )
 }
 

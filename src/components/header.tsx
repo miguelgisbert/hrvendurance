@@ -2,7 +2,7 @@ import React, {useRef, useEffect, useState, FC} from 'react'
 import { Grid, Box, FormGroup, FormControlLabel, Card, Theme } from '@mui/material'
 import {LanguageSwitch} from './languageSwitch'
 import {ThemeModeSwitch} from './themeModeSwitch'
-// import { Login } from './login'
+import { Login } from './login'
 import logoPart1 from '../assets/logoPart1.svg'
 import logoPart2 from '../assets/logoPart2.svg'
 
@@ -16,7 +16,7 @@ interface HeaderProps {
   showPopper: boolean;
 }
 
-const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode, /*showPopper*/}) => {
+const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggleThemeMode, showPopper}) => {
 
     const en = useRef<HTMLButtonElement>(null)
     const es = useRef<HTMLButtonElement>(null)
@@ -74,7 +74,7 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggl
 
     return (
         <Grid container component="header" zIndex="1000" height="120px" padding={window.innerWidth > 650 ? "20px 50px" : window.innerWidth < 365 ? "20px 0 20px 20px" : "20px"} position={window.innerWidth > 650 ? "fixed" : "relative"} sx={{ background: (theme: Theme) => theme.myBackground.header }}>
-            <Grid container item xs={5} md={6} alignItems="center" justifyContent="start">
+            <Grid container item xs={5} md={5} alignItems="center" justifyContent="start">
                 {window.innerWidth > 650 && (
                   <Box component="img" src={logoPart2} ref={group2Ref} 
                   sx={{ 
@@ -98,7 +98,10 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggl
                 <Card sx={{ opacity: mainLogoBGopacity, width:"350px", height:"350px", position:"fixed", top: "calc(50% + 100px)", left: "20%", zIndex: 1, transform: "translate(-18%, -58%)", backgroundColor: theme => theme.palette.secondary.main}}></Card>
                 )}
             </Grid>
-            <Grid container item xs={7} md={6} >
+            <Grid container item xs={false} md={2} alignItems="center" justifyContent="end">
+              <Login showPopper={showPopper} />
+            </Grid>
+            <Grid container item xs={7} md={5} >
               <Grid container item xs={12} alignItems="end" justifyContent="end">
                 <ThemeModeSwitch
                   checked={themeMode === 'dark'}
@@ -123,7 +126,6 @@ const Header: FC<HeaderProps> = ({setLanguage, theme, language, themeMode, toggl
                 </FormGroup>
               </Grid>
             </Grid>
-            {/* <Login showPopper={showPopper} /> */}
         </Grid>
     )
 }
