@@ -74,6 +74,11 @@ const translations: Translations = {
       appPayingInterest: "How interested would you be in paying a premium subscription for this app? (we cannot know the price yet but it could be around 5 € / month or 50 € / year)",
       why: "Why?",
       mustBe18: "You must be 18 years old or older.",
+
+      // Login
+      password: "Password",
+      login: "Login",
+      createAccount: "Create Account",
     },
 
     es: {
@@ -149,6 +154,11 @@ const translations: Translations = {
       appPayingInterest: "¿Cuánta disposición tendrías a pagar una  suscripción premium por esta app? (no podemos saber cuál sería el precio todavía pero orientativamente podría estar en 5 € / mes o 50 € / año)",
       why: "¿Por qué?",
       mustBe18: "Sólo para mayores de 18 años.",
+
+      // Login
+      password: "Contraseña",
+      login: "Iniciar sesión",
+      createAccount: "Crear cuenta",
     },
 
     ca: {
@@ -224,6 +234,11 @@ const translations: Translations = {
       appPayingInterest: "Quina disposició tindries a pagar una subscripció premium per aquesta app? (no podem saber quin seria el preu encara però orientativament podria estar en 5 € / mes o 50 € / any)",
       why: "Per què?",
       mustBe18: "Has de ser major de 18 anys.",
+
+      // Login
+      password: "Contrasenya",
+      login: "Iniciar sessió",
+      createAccount: "Crear compte",
     }
 };
 

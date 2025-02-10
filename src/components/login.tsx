@@ -3,7 +3,7 @@ import { auth } from '../firebaseConfig'
 import { signOut, onAuthStateChanged } from 'firebase/auth'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
-import { Button, Box, TextField, Popper, Typography, Snackbar, Alert, SnackbarCloseReason, ClickAwayListener } from '@mui/material'
+import { Button, Box, TextField, Popper, Snackbar, Alert, SnackbarCloseReason, ClickAwayListener } from '@mui/material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -13,12 +13,14 @@ import { usePopper } from '../PopperContext'
 import { CustomUser } from '../types'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import LoginIcon from '@mui/icons-material/Login';
+import { Translations, Language } from '../types'
 
 interface LoginProps {
   showPopper: boolean
+  translations: Translations[Language]
 }
 
-const Login: React.FC<LoginProps> = ({ showPopper }) => {
+const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
 
   const { user, setUser, setLoading } = useContext(UserContext)
   const { formToShow, setFormToShow } = usePopper()
@@ -218,7 +220,6 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
         </Box>
       ) : (
         <Box gap={2} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-          <Typography>{user?.email}</Typography>
           <Button><LogoutIcon onClick={logout} sx={{ color: "white" }} /></Button>
         </Box>
       )}
@@ -262,13 +263,13 @@ const Login: React.FC<LoginProps> = ({ showPopper }) => {
             <TextField
               required
               id="password_login"
-              label="Password"
+              label={translations.password}
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
             <Button type="submit" onClick={formToShow === 'login' ? signIn : signUp}>
-              {formToShow === 'login' ? 'Sign In' : 'Create Account'}
+              {formToShow === 'login' ? translations.login : translations.createAccount}
             </Button>
           </Box>
         </Popper>
