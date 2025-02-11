@@ -1,14 +1,15 @@
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
+import { Grid} from '@mui/material'
 import Chip from '@mui/material/Chip'
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement'
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun'
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk'
 import { styled } from '@mui/material/styles'
 
-interface TrainingTableProps {
+interface UserTableProps {
     translations: {
-      [key: string]: string;
-    };
+      [key: string]: string
+    }
 }
 
 const StyledDataGrid = styled(DataGrid)(() => ({
@@ -26,7 +27,7 @@ const StyledDataGrid = styled(DataGrid)(() => ({
     '--DataGrid-pinnedBackground': 'transparent',
 }));
 
-export default function TrainingTable({translations}: TrainingTableProps) {
+export default function UserTable({translations}: UserTableProps) {
 
     // Data grid
     const columns: GridColDef[] = [
@@ -36,6 +37,15 @@ export default function TrainingTable({translations}: TrainingTableProps) {
         width: 150,
         sortable: false,
         headerClassName: 'header-transparent',
+        renderCell: (params: GridCellParams) => {
+            const value = params.value as { day: string; date: string }
+            return (
+                <div>
+                    <div>{value.day}</div>
+                    <div>{value.date}</div>
+                </div>  
+            )
+            },
         },
         {
         field: 'hr',
@@ -95,18 +105,23 @@ export default function TrainingTable({translations}: TrainingTableProps) {
     ]
 
     const generateRows = () => ([
-        { id: 1, Day: translations.Monday,    hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
-        { id: 2, Day: translations.Tuesday,   hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
-        { id: 3, Day: translations.Wednesday, hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
-        { id: 4, Day: translations.Thursday,  hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
-        { id: 5, Day: translations.Friday,    hr: 69, RMSSD: 50, MRMSSD: 50, lnRMSSD: 3.91, MlnRMSSD: 3.90, Suggestion: translations.HighIntensity },
-        { id: 6, Day: translations.Saturday,  hr: 61, RMSSD: 52, MRMSSD: 50, lnRMSSD: 3.95, MlnRMSSD: 3.92, Suggestion: translations.HighIntensity },
-        { id: 7, Day: translations.Sunday,    hr: 71, RMSSD: 47, MRMSSD: 49, lnRMSSD: 3.85, MlnRMSSD: 3.89, Suggestion: translations.LowIntensity },
-        { id: 8, Day: translations.Monday,    hr: 64, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.90, Suggestion: translations.Rest },
-        { id: 9, Day: translations.Tuesday,   hr: 60, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
+        { id: 1, Day: translations.Monday,      date: '01/01/2025',     hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
+        { id: 2, Day: translations.Tuesday,     date: '02/01/2025',     hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
+        { id: 3, Day: translations.Wednesday,   date: '03/01/2025',     hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
+        { id: 4, Day: translations.Thursday,    date: '04/01/2025',     hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
+        { id: 5, Day: translations.Friday,      date: '05/01/2025',     hr: 69, RMSSD: 50, MRMSSD: 50, lnRMSSD: 3.91, MlnRMSSD: 3.90, Suggestion: translations.HighIntensity },
     ])
     
     const rows = generateRows()
+
+    const today = new Date();
+    const todayFormatted = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+
+    rows.push({
+      id: rows.length + 1,
+      Day: { day: translations.Today, date: todayFormatted },
+    });
+
     const getChipProps = (label: string) => {
         switch (label) {
         case translations.Rest:
@@ -121,7 +136,7 @@ export default function TrainingTable({translations}: TrainingTableProps) {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid container alignItems="center" marginTop = {window.innerWidth < 650 ? "none" : "120px"} justifyContent={window.innerWidth < 950 ? "flex-start" : "center"} padding="70px 20px 130px" sx={{ overflowX: "auto" }}>
             <StyledDataGrid  
                 rows={rows} 
                 columns={columns}
@@ -139,6 +154,6 @@ export default function TrainingTable({translations}: TrainingTableProps) {
                     height: 526
                 }}
             />
-        </div>
+        </Grid>
     );
 }

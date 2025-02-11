@@ -36,14 +36,6 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
-    console.log("USER: ",user)
-  }, [user])
-
-  useEffect(() => {
-    console.log("formToShow: ",formToShow)
-  }, [formToShow])
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       const fetchUser = async () => {
         if (user) {
@@ -77,18 +69,13 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
     setFormToShow(showPopper ? 'signup' : 'none')
   }, [showPopper])
 
-  useEffect(() => {
-    console.log("USER: ",user)
-  }, [user])
 
   const signIn = async () => {
     setFormToShow('none')
     setAnchorEl(null)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      console.log("User signed in successfully.")
       const user = auth.currentUser
-      console.log("USER: ", user)
       // if (user) {
       //   const docRef = doc(db, 'users', user.uid)
       //   const docSnap = await getDoc(docRef)
