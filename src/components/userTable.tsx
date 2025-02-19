@@ -107,10 +107,10 @@ export default function UserTable({translations}: UserTableProps) {
     ]
 
     const generateRows = (): RowData[] => [
-        { id: 1, Day: { day: translations.Monday,      date: '14/01/2025' },     hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
-        { id: 2, Day: { day: translations.Tuesday,     date: '15/01/2025' },     hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
-        { id: 3, Day: { day: translations.Wednesday,   date: '16/01/2025' },     hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
-        { id: 4, Day: { day: translations.Thursday,    date: '17/01/2025' },     hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
+        // { id: 1, Day: { day: translations.Monday,      date: '14/01/2025' },     hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
+        // { id: 2, Day: { day: translations.Tuesday,     date: '15/01/2025' },     hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
+        // { id: 3, Day: { day: translations.Wednesday,   date: '16/01/2025' },     hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
+        { id: 4, Day: { day: translations.Thursday,    date: '17/01/2025' },     hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.HighIntensity },
         { id: 5, Day: { day: translations.Friday,      date: '18/01/2025' },     hr: 69, RMSSD: 50, MRMSSD: 50, lnRMSSD: 3.91, MlnRMSSD: 3.90, Suggestion: translations.HighIntensity },
     ]
 
@@ -119,7 +119,36 @@ export default function UserTable({translations}: UserTableProps) {
 
     const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
         if (newRow.RMSSD !== oldRow.RMSSD) {
-          newRow.lnRMSSD = newRow.RMSSD ? parseFloat(Math.log(newRow.RMSSD).toFixed(2)) : undefined
+            newRow.lnRMSSD = newRow.RMSSD ? parseFloat(Math.log(newRow.RMSSD).toFixed(2)) : undefined
+          
+            const recentRows = rows.slice(-4).map(row => row.RMSSD).filter(value => value !== undefined) as number[];
+            const averageRMSSD = recentRows.length > 0 ? recentRows.reduce((a, b) => a + b, 0) / recentRows.length : null;
+            
+            console.log("averageRMSSD", averageRMSSD)
+            console.log("recentRows", recentRows)
+            if (!averageRMSSD) {
+                newRow.Suggestion = translations.LowIntensity;
+            } else if (newRow.RMSSD > averageRMSSD) {
+                const lastTwoSuggestions = [
+                    rows[rows.length - 3]?.Suggestion,
+                    rows[rows.length - 2]?.Suggestion,
+                ];
+                console.log("lastTwoSuggestions", lastTwoSuggestions)
+                if (lastTwoSuggestions.every(suggestion => suggestion === translations.HighIntensity)) {
+                    newRow.Suggestion = translations.LowIntensity;
+                } else {
+                    newRow.Suggestion = translations.HighIntensity;
+                }
+            } else if (newRow.RMSSD === averageRMSSD) {
+                newRow.Suggestion = translations.LowIntensity;
+            } else {
+                const previousSuggestion = rows[rows.length - 1]?.Suggestion;
+                if (previousSuggestion === translations.Rest) {
+                    newRow.Suggestion = translations.LowIntensity;
+                } else {
+                    newRow.Suggestion = translations.Rest;
+                }
+            }
         }
         return newRow
     }

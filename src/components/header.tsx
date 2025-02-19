@@ -35,7 +35,6 @@ const Header: FC<HeaderProps> = ({ setLanguage, theme, translations, language, t
   const group2Ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
-      console.log("test: ", showLogoAnimation)
       const handleScroll = () => {
         const scrollY = window.scrollY
         const maxScroll = 500
