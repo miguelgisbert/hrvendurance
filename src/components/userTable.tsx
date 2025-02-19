@@ -1,4 +1,5 @@
-import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
+import { useState, useEffect } from 'react'
+import { DataGrid, GridCellParams, GridColDef, GridRowModel } from '@mui/x-data-grid'
 import { Grid} from '@mui/material'
 import Chip from '@mui/material/Chip'
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement'
@@ -12,6 +13,17 @@ interface UserTableProps {
     }
 }
 
+interface RowData {
+    id: number
+    Day: { day: string, date: string }
+    hr?: number | null
+    RMSSD?: number | null
+    MRMSSD?: number | null
+    lnRMSSD?: number | null
+    MlnRMSSD?: number | null
+    Suggestion: string
+}
+
 const StyledDataGrid = styled(DataGrid)(() => ({
     '& .MuiDataGrid-columnHeaders': {
         backgroundColor: 'transparent'
@@ -21,11 +33,17 @@ const StyledDataGrid = styled(DataGrid)(() => ({
     },
     '& .MuiDataGrid-cell': {
         backgroundColor: 'transparent',
-        textAlign: 'center'
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '10px 0',
+        whiteSpace: 'normal',
+        wordWrap: 'break-word'
     },
     '--DataGrid-containerBackground': 'transparent',
     '--DataGrid-pinnedBackground': 'transparent',
-}));
+}))
 
 export default function UserTable({translations}: UserTableProps) {
 
@@ -38,7 +56,7 @@ export default function UserTable({translations}: UserTableProps) {
         sortable: false,
         headerClassName: 'header-transparent',
         renderCell: (params: GridCellParams) => {
-            const value = params.value as { day: string; date: string }
+            const value = params.value as { day: string, date: string }
             return (
                 <div>
                     <div>{value.day}</div>
@@ -66,24 +84,8 @@ export default function UserTable({translations}: UserTableProps) {
         headerClassName: 'header-transparent',
         },
         {
-        field: 'MRMSSD',
-        headerName: 'MRMSSD',
-        type: 'number',
-        width: 120,
-        sortable: false,
-        headerClassName: 'header-transparent',
-        },
-        {
         field: 'lnRMSSD',
         headerName: 'lnRMSSD',
-        type: 'number',
-        width: 120,
-        sortable: false,
-        headerClassName: 'header-transparent',
-        },
-        {
-        field: 'MlnRMSSD',
-        headerName: 'MlnRMSSD',
         type: 'number',
         width: 120,
         sortable: false,
@@ -104,36 +106,58 @@ export default function UserTable({translations}: UserTableProps) {
         },
     ]
 
-    const generateRows = () => ([
-        { id: 1, Day: translations.Monday,      date: '01/01/2025',     hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
-        { id: 2, Day: translations.Tuesday,     date: '02/01/2025',     hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
-        { id: 3, Day: translations.Wednesday,   date: '03/01/2025',     hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
-        { id: 4, Day: translations.Thursday,    date: '04/01/2025',     hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
-        { id: 5, Day: translations.Friday,      date: '05/01/2025',     hr: 69, RMSSD: 50, MRMSSD: 50, lnRMSSD: 3.91, MlnRMSSD: 3.90, Suggestion: translations.HighIntensity },
-    ])
+    const generateRows = (): RowData[] => [
+        { id: 1, Day: { day: translations.Monday,      date: '14/01/2025' },     hr: 68, RMSSD: 46, MRMSSD: 50, lnRMSSD: 3.83, MlnRMSSD: 3.92, Suggestion: translations.Rest },
+        { id: 2, Day: { day: translations.Tuesday,     date: '15/01/2025' },     hr: 67, RMSSD: 49, MRMSSD: 50, lnRMSSD: 3.89, MlnRMSSD: 3.91, Suggestion: translations.LowIntensity },
+        { id: 3, Day: { day: translations.Wednesday,   date: '16/01/2025' },     hr: 66, RMSSD: 53, MRMSSD: 50, lnRMSSD: 3.97, MlnRMSSD: 3.91, Suggestion: translations.HighIntensity },
+        { id: 4, Day: { day: translations.Thursday,    date: '17/01/2025' },     hr: 65, RMSSD: 46, MRMSSD: 49, lnRMSSD: 3.83, MlnRMSSD: 3.88, Suggestion: translations.LowIntensity },
+        { id: 5, Day: { day: translations.Friday,      date: '18/01/2025' },     hr: 69, RMSSD: 50, MRMSSD: 50, lnRMSSD: 3.91, MlnRMSSD: 3.90, Suggestion: translations.HighIntensity },
+    ]
+
+    const [rows, setRows] = useState(generateRows())
+
+
+    const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
+        if (newRow.RMSSD !== oldRow.RMSSD) {
+          newRow.lnRMSSD = newRow.RMSSD ? parseFloat(Math.log(newRow.RMSSD).toFixed(2)) : undefined
+        }
+        return newRow
+    }
+
+    const today = new Date()
+    const todayFormatted = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`
+
+    const addNewRow = () => {
+        const rowExists = rows.some(row => row.Day.date === todayFormatted)
+        if (!rowExists) {
+            const newRow: RowData = {
+            id: rows.length + 1,
+            Day: { day: translations.Saturday, date: todayFormatted },
+            hr: undefined,
+            RMSSD: undefined,
+            lnRMSSD: undefined,
+            Suggestion: '',
+            }
+            setRows([...rows, newRow])
+        }
+    }
     
-    const rows = generateRows()
-
-    const today = new Date();
-    const todayFormatted = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
-
-    rows.push({
-      id: rows.length + 1,
-      Day: { day: translations.Today, date: todayFormatted },
-    });
+      useEffect(() => {
+        addNewRow()
+      }, [])
 
     const getChipProps = (label: string) => {
         switch (label) {
         case translations.Rest:
-            return { color: '#a05555', Icon: SelfImprovementIcon };
+            return { color: '#a05555', Icon: SelfImprovementIcon }
         case translations.LowIntensity:
-            return { color: '#b6970f', Icon: DirectionsWalkIcon };
+            return { color: '#b6970f', Icon: DirectionsWalkIcon }
         case translations.HighIntensity:
-            return { color: '#4b7c2f', Icon: DirectionsRunIcon };
+            return { color: '#4b7c2f', Icon: DirectionsRunIcon }
         default:
-            return { color: 'default', Icon: SelfImprovementIcon };
+            return { color: 'default', Icon: SelfImprovementIcon }
         }
-    };
+    }
 
     return (
         <Grid container alignItems="center" marginTop = {window.innerWidth < 650 ? "none" : "120px"} justifyContent={window.innerWidth < 950 ? "flex-start" : "center"} padding="70px 20px 130px" sx={{ overflowX: "auto" }}>
@@ -141,6 +165,8 @@ export default function UserTable({translations}: UserTableProps) {
                 rows={rows} 
                 columns={columns}
                 hideFooter
+                getRowHeight={() => 'auto'}
+                processRowUpdate={processRowUpdate}
                 /*components={{
                     root: {
                         style: {
@@ -151,9 +177,9 @@ export default function UserTable({translations}: UserTableProps) {
                 }}*/
                 sx={{
                     maxWidth: 1000,
-                    height: 526
+                    height: 526,
                 }}
             />
         </Grid>
-    );
+    )
 }
