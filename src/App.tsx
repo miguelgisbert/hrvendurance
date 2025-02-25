@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo, useEffect } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import { Grid } from '@mui/material'
 import createMyTheme from './theme'
@@ -30,7 +30,7 @@ function App() {
 
   const [language, setLanguage] = useState<string>(browserLang ? browserLang : 'en')
   const [themeMode, setThemeMode] = useState<"dark" | "light">(localStorage.getItem('themeMode') as "dark" | "light" || (prefersDarkMode ? 'dark' : 'light'))
-  const { user, loading } = useContext(UserContext) as { user: CustomUser, loading: boolean }
+  const { user } = useContext(UserContext) as { user: CustomUser, loading: boolean }
   const [showPopper] = useState<boolean>(false)
 
 

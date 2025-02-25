@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { DataGrid, GridCellParams, GridColDef, GridRowModel, GridEventListener } from '@mui/x-data-grid'
+import { DataGrid, GridCellParams, GridColDef, GridRowModel } from '@mui/x-data-grid'
 import { colors, Grid, Typography } from '@mui/material'
 import Chip from '@mui/material/Chip'
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement'
