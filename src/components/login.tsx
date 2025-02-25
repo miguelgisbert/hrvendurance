@@ -11,8 +11,11 @@ import { doc, setDoc, getFirestore, getDoc } from 'firebase/firestore'
 import { UserContext } from '../UserContext'
 import { usePopper } from '../PopperContext'
 import { CustomUser } from '../types'
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import LoginIcon from '@mui/icons-material/Login';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
+import LoginIcon from '@mui/icons-material/Login'
+import CloseIcon from '@mui/icons-material/Close'
+import IconButton from '@mui/material/IconButton'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Translations, Language } from '../types'
 
 interface LoginProps {
@@ -75,17 +78,6 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
     setAnchorEl(null)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      const user = auth.currentUser
-      // if (user) {
-      //   const docRef = doc(db, 'users', user.uid)
-      //   const docSnap = await getDoc(docRef)
-      //   if (docSnap.exists()) {
-      //     const data = docSnap.data()
-      //     setUser({ ...user, ...data } as CustomUser)
-      //   } else {
-      //     setUser(user as CustomUser)
-      //   }
-      // }
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as FirebaseError
@@ -120,18 +112,6 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
       await signOut(auth);
       await signInWithEmailAndPassword(auth, email, password);
 
-      // const user = auth.currentUser
-      // console.log("USER: ", user)
-      // if (user) {
-      //   const docRef = doc(db, 'users', user.uid)
-      //   const docSnap = await getDoc(docRef)
-      //   if (docSnap.exists()) {
-      //     const data = docSnap.data()
-      //     setUser({ ...user, ...data } as CustomUser)
-      //   } else {
-      //     setUser(user as CustomUser)
-      //   }
-      // }
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as FirebaseError
@@ -182,12 +162,29 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
 
   return (
     <>
-    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-      <Alert onClose={handleAlertClose} severity="error" sx={{ width: '100%' }}>
-        {errorMessage}
-      </Alert>
-    </Snackbar>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert 
+          onClose={handleAlertClose} 
+          severity="error" 
+          sx={{ width: '100%' }}
+          action={
+            <IconButton
+              aria-label="alert"
+              color="inherit"
+              size="small"
+              onClick={handleAlertClose}
+            >
+              <CloseIcon fontSize="inherit" sx={{ color: 'grey' }} />
+            </IconButton>
+          }
+          iconMapping={{
+            error: <ErrorOutlineIcon sx={{ color: 'grey' }} /> 
+          }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       {!user ? (
         <Box sx={{ display: "flex", alignItems: "stretch" }}>
           <Button ref={loginButtonRef} color="inherit" sx={{ display: "flex", alignItems: "center", height: "100%" }} 
@@ -207,6 +204,7 @@ const Login: React.FC<LoginProps> = ({ showPopper, translations }) => {
         </Box>
       ) : (
         <Box gap={2} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <Box sx={{ color: "white" }}>{user.email}</Box>
           <Button><LogoutIcon onClick={logout} sx={{ color: "white" }} /></Button>
         </Box>
       )}

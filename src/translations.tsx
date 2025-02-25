@@ -79,6 +79,9 @@ const translations: Translations = {
       password: "Password",
       login: "Login",
       createAccount: "Create Account",
+
+      // User Table
+      first_instructions: "Please fill your HR and HRV resting morning measures for today.",
     },
 
     es: {
@@ -159,6 +162,9 @@ const translations: Translations = {
       password: "Contraseña",
       login: "Iniciar sesión",
       createAccount: "Crear cuenta",
+
+      // User Table
+      first_instructions: "Por favor, escribe tus medidas matinales y en reposo de FC y VFC para hoy.",
     },
 
     ca: {
@@ -239,6 +245,9 @@ const translations: Translations = {
       password: "Contrasenya",
       login: "Iniciar sessió",
       createAccount: "Crear compte",
+
+      // User table
+      first_instructions: "Per favor, escriga les seues mesures matinals i en repòs de FC i VFC per a hui.",
     }
 };
 

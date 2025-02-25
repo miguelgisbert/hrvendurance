@@ -29,7 +29,7 @@ function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
   const [language, setLanguage] = useState<string>(browserLang ? browserLang : 'en')
-  const [themeMode, setThemeMode] = useState<"dark" | "light">(prefersDarkMode ? 'dark' : 'light')
+  const [themeMode, setThemeMode] = useState<"dark" | "light">(localStorage.getItem('themeMode') as "dark" | "light" || (prefersDarkMode ? 'dark' : 'light'))
   const { user, loading } = useContext(UserContext) as { user: CustomUser, loading: boolean }
   const [showPopper] = useState<boolean>(false)
 
@@ -39,7 +39,11 @@ function App() {
   }, [language, themeMode]);
 
   const toggleThemeMode = () => {
-    setThemeMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+    setThemeMode((prevMode) => {
+      const newMode = prevMode === 'light' ? 'dark' : 'light'
+      localStorage.setItem('themeMode', newMode)
+      return newMode
+    })
   }
 
   return (
